@@ -10,7 +10,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class MixinJSON:
+class SerializeJSON:
 
     def __init__(self):
         pass
@@ -34,10 +34,10 @@ class MixinJSON:
         j = json.dumps(d, ensure_ascii=ensure_ascii, indent=indent, sort_keys=sort_keys, **kwargs)
         return j
             
-class Serializeable(MixinJSON):
+class Serializeable(SerializeJSON):
 
     def __init__(self):
-        MixinJSON.__init__(self)
+        SerializeJSON.__init__(self)
 
             
 

@@ -119,6 +119,8 @@ class CitedString(Base, Serializeable):
             self.prior_ids.add(self.id)
             self.id = slug
 
+    
+
 
 class GeographicName(CitedString):
     """A Geographic Name"""
