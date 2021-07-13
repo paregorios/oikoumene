@@ -4,13 +4,11 @@
 Names
 """
 
+from collections.abc import Sequence, Set
 import logging
-from typing import List, Sequence
 from oikoumene.base import Base
 from textnorm import normalize_space, normalize_unicode
-from collections.abc import Sequence, Set
-from pprint import pformat
-from typing import Union
+from typing import List, Union
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +16,7 @@ def norm(v):
     return normalize_unicode(normalize_space(v), 'NFC')
 
 class Name(Base):
-
+    """A Geographic Name"""
     def __init__(
         self,
         attested: str='',
