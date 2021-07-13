@@ -122,6 +122,7 @@ class CitedString(Base, Serializeable):
 
 class GeographicName(CitedString):
     """A Geographic Name"""
+
     def __init__(
         self,
         attested: str='',
@@ -132,4 +133,15 @@ class GeographicName(CitedString):
         CitedString.__init__(self, attested, romanized, cleanup, **kwargs)
 
 
+class GeographicString(CitedString):
+    """A geographic string"""
+
+    def __init__(
+        self,
+        attested: str='',
+        romanized: Union[Sequence[str], Set[str]]=[],
+        cleanup: bool=True,
+        **kwargs
+    ):
+        CitedString.__init__(self, attested, romanized, cleanup, **kwargs)
         

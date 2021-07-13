@@ -5,7 +5,7 @@
 import json
 import logging
 from nose.tools import assert_equal, assert_false, assert_true, raises
-from oikoumene.stringlike import CitedString, GeographicName
+from oikoumene.stringlike import CitedString, GeographicName, GeographicString
 from pathlib import Path
 from pprint import pprint
 from unittest import TestCase
@@ -142,6 +142,20 @@ class Test_GeographicName(TestCase):
     @raises(ValueError)
     def test_init(self):
         n = GeographicName()
+
+class Test_GeographicString(TestCase):
+
+    def setUp(self):
+        """Change me"""
+        pass
+
+    def tearDown(self):
+        """Change me"""
+        pass
+
+    @raises(ValueError)
+    def test_init(self):
+        n = GeographicString()
 
 
 
