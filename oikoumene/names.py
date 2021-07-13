@@ -7,6 +7,8 @@ Names
 from collections.abc import Sequence, Set
 import logging
 from oikoumene.base import Base
+from pprint import pformat
+from slugify import slugify
 from textnorm import normalize_space, normalize_unicode
 from typing import List, Union
 
@@ -38,7 +40,10 @@ class Name(Base):
     # attested form of the name (i.e., appears in a witness)
     @property
     def attested(self) -> str:
-        return self._attested
+        try:
+            return self._attested
+        except AttributeError:
+            return ''
 
     @attested.setter
     def attested(self, value: str):
@@ -48,12 +53,21 @@ class Name(Base):
                 return
         else:
             val = value
-        self._attested = val
+        try:
+            prior_val = self._attested
+        except AttributeError:
+            prior_val = ''
+        if val != prior_val:
+            self._attested = val
+            self._generate_id()
 
     # romanized form(s) of the attested name
     @property
     def romanized(self) -> List[str]:
-        return self._romanized
+        try:
+            return self._romanized
+        except AttributeError:
+            return []
 
     @romanized.setter
     def romanized(self, values:Union[str, Sequence[str], Set[str]]):
@@ -65,6 +79,7 @@ class Name(Base):
                 f'Expected {expected} but got {type(values)}.')
         if isinstance(values, str):
             values = [values]
+        dirty = False
         for v in values:
             if not isinstance(v, str):
                 raise TypeError(
@@ -80,6 +95,27 @@ class Name(Base):
                 self._romanized
             except AttributeError:
                 self._romanized = []
-            prior = set(self._romanized)
-            prior.add(val)
-            self._romanized = list(prior)
+            name_set = set(self._romanized)
+            name_set.add(val)
+            name_set = sorted(list(name_set))
+            if name_set != self._romanized:
+                self._romanized = name_set
+                dirty = True
+        if dirty:
+            self._generate_id()
+
+    def _generate_id(self):
+        """Make the most useful possible ID for this name."""
+        base = self.attested
+        if not base:
+            base = self.romanized[0]
+        slug = slugify(base)
+        if slug != self.id:
+            try:
+                self.prior_ids
+            except AttributeError:
+                self.prior_ids = set()
+            self.prior_ids.add(self.id)
+            self.id = slug
+
+        

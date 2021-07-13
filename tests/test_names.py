@@ -40,14 +40,18 @@ class Test_Name(TestCase):
     def test_init_reqs(self):
         n = Name(romanized=['Moontown'])
         assert_equal(['Moontown'], n.romanized)
+        assert_equal('moontown', n.id)
+        assert_true(list(n.prior_ids)[0].startswith('Name.'))
 
     def test_init_romanized(self):
         n = Name(romanized=['Moontown', 'Mōntown'])
-        assert_equal(['Moontown', 'Mōntown'], sorted(n.romanized))
+        assert_equal(['Moontown', 'Mōntown'], n.romanized)
+        assert_equal('moontown', n.id)
 
     def test_init_cleanup(self):
         n = Name(romanized=['    Moontown'])
         assert_equal(['Moontown'], n.romanized)
+        assert_equal('moontown', n.id)
 
     def test_init_cleanup_false(self):
         n = Name(romanized=['    Moontown'], cleanup=False)
@@ -59,6 +63,7 @@ class Test_Name(TestCase):
             romanized={'Moontown'})
         assert_equal('Moontown', n.attested)
         assert_equal(['Moontown'], n.romanized)
+        assert_equal('moontown', n.id)
 
     def test_init_adhoc(self):
         n = Name(romanized=('Moontown',), banana='crispy')
@@ -84,6 +89,20 @@ class Test_Name(TestCase):
     def test_set_romanized_bad_sequence(self):
         n = Name(romanized='Moontown')
         n.romanized = [73]
+
+    def test_id_generation(self):
+        n = Name(romanized='Moontown')
+        assert_equal('moontown', n.id)
+        n.romanized = 'Mù ēn dūn'
+        assert_equal(n.id, 'moontown')  # uses alphabetically first romanized form if no attested
+        n.attested='穆恩敦'
+        assert_equal(n.id, 'mu-en-dun')  # attested overrides romanized
+        prior = sorted(list(n.prior_ids))
+        assert_equal(2, len(prior))
+        assert_true(prior[0].startswith('Name.'))
+        assert_equal('moontown', prior[1])
+        
+
 
 
 
