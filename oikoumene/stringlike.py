@@ -18,16 +18,14 @@ logger = logging.getLogger(__name__)
 def norm(v):
     return normalize_unicode(normalize_space(v), 'NFC')
 
-class Name(Base, Serializeable):
-    """A Geographic Name"""
+class CitedString(Base, Serializeable):
+
     def __init__(
         self,
         attested: str='',
         romanized: Union[Sequence[str], Set[str]]=[],
         cleanup: bool=True,
-        **kwargs
     ):
-
         Base.__init__(self)
         Serializeable.__init__(self)
         if not romanized:
@@ -36,10 +34,8 @@ class Name(Base, Serializeable):
         self._cleanup = cleanup
         self.attested = attested
         self.romanized = romanized
-        for kw, arg in kwargs.items():
-            setattr(self, kw, arg)
 
-    # attested form of the name (i.e., appears in a witness)
+    # attested form of the string (i.e., appears in a witness)
     @property
     def attested(self) -> str:
         try:
@@ -63,7 +59,7 @@ class Name(Base, Serializeable):
             self._attested = val
             self._generate_id()
 
-    # romanized form(s) of the attested name
+    # romanized form(s) of the attested string
     @property
     def romanized(self) -> List[str]:
         try:
@@ -107,7 +103,7 @@ class Name(Base, Serializeable):
             self._generate_id()
 
     def _generate_id(self):
-        """Make the most useful possible ID for this name."""
+        """Make the most useful possible ID for this string."""
         base = self.attested
         if not base:
             base = self.romanized[0]
@@ -119,5 +115,20 @@ class Name(Base, Serializeable):
                 self.prior_ids = set()
             self.prior_ids.add(self.id)
             self.id = slug
+
+
+class Name(CitedString):
+    """A Geographic Name"""
+    def __init__(
+        self,
+        attested: str='',
+        romanized: Union[Sequence[str], Set[str]]=[],
+        cleanup: bool=True,
+        **kwargs
+    ):
+        CitedString.__init__(self, attested, romanized, cleanup)
+        for kw, arg in kwargs.items():
+            setattr(self, kw, arg)
+
 
         
