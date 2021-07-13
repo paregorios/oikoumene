@@ -38,6 +38,25 @@ class CitedString(Base, Serializeable):
         for kw, arg in kwargs.items():
             setattr(self, kw, arg)
 
+    @property
+    def id(self) -> str:
+        return self._id
+
+    @id.setter
+    def id(self, value: str):
+        if self._cleanup:
+            val = norm(value)
+            if val == '':
+                raise ValueError(val)
+        else:
+            val = value
+        try:
+            self.prior_ids
+        except AttributeError:
+            self.prior_ids = set()
+        self.prior_ids.add(self._id)
+        self._id = val
+
     # attested form of the string (i.e., appears in a witness)
     @property
     def attested(self) -> str:
@@ -111,16 +130,13 @@ class CitedString(Base, Serializeable):
         if not base:
             base = self.romanized[0]
         slug = slugify(base)
-        if slug != self.id:
+        if slug != self._id:
             try:
                 self.prior_ids
             except AttributeError:
                 self.prior_ids = set()
-            self.prior_ids.add(self.id)
-            self.id = slug
-
-    
-
+            self.prior_ids.add(self._id)
+            self._id = slug
 
 class GeographicName(CitedString):
     """A Geographic Name"""

@@ -12,6 +12,6 @@ logger = logging.getLogger(__name__)
 class Base:
     """Base Mixin Class"""
     def __init__(self):
-        self.id = '.'.join((type(self).__name__, str(uuid4())))
+        self._id = '.'.join((type(self).__name__, str(uuid4())))
 
 
