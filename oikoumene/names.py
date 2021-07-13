@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Names
+"""
+
+import logging
+from typing import List, Sequence
+from oikoumene.base import Base
+from textnorm import normalize_space, normalize_unicode
+from collections.abc import Sequence, Set
+from pprint import pformat
+from typing import Union
+
+logger = logging.getLogger(__name__)
+
+def norm(v):
+    return normalize_unicode(normalize_space(v), 'NFC')
+
+class Name(Base):
+
+    def __init__(
+        self,
+        attested: str='',
+        romanized: Union[Sequence[str], Set[str]]=[],
+        cleanup: bool=True,
+        **kwargs
+    ):
+
+        Base.__init__(self)
+        if not romanized:
+            raise ValueError(
+                f'At least one romanized name form must be provided to initialize a Name.')
+        self._cleanup = cleanup
+        self.attested = attested
+        self.romanized = romanized
+        for kw, arg in kwargs.items():
+            setattr(self, kw, arg)
+
+    # attested form of the name (i.e., appears in a witness)
+    @property
+    def attested(self) -> str:
+        return self._attested
+
+    @attested.setter
+    def attested(self, value: str):
+        if self._cleanup:
+            val = norm(value)
+            if val == '':
+                return
+        else:
+            val = value
+        self._attested = val
+
+    # romanized form(s) of the attested name
+    @property
+    def romanized(self) -> List[str]:
+        return self._romanized
+
+    @romanized.setter
+    def romanized(self, values:Union[str, Sequence[str], Set[str]]):
+        expected = (str, Sequence, Set)
+        if not isinstance(values, expected):
+            expected = ', '.join([str(e) for e in expected])
+            raise TypeError(
+                f'Invalid type used to set Name.romanized. '
+                f'Expected {expected} but got {type(values)}.')
+        if isinstance(values, str):
+            values = [values]
+        for v in values:
+            if not isinstance(v, str):
+                raise TypeError(
+                    f'Invalid type used to set Name.romanized. '
+                    f'Expected {str} but got {type(v)} ({v}).')
+            if self._cleanup:
+                val = norm(v)
+                if val == '':
+                    continue
+            else:
+                val = v
+            try:
+                self._romanized
+            except AttributeError:
+                self._romanized = []
+            prior = set(self._romanized)
+            prior.add(val)
+            self._romanized = list(prior)
