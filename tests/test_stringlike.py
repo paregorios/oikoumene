@@ -5,7 +5,7 @@
 import json
 import logging
 from nose.tools import assert_equal, assert_false, assert_true, raises
-from oikoumene.stringlike import CitedString
+from oikoumene.stringlike import CitedString, Name
 from pathlib import Path
 from pprint import pprint
 from unittest import TestCase
@@ -118,6 +118,28 @@ class Test_CitedString(TestCase):
             assert_equal(v, d[k])
         assert_true(d['prior_ids'][0].startswith('CitedString.'))
 
+class Test_Name(TestCase):
 
+    def setUp(self):
+        """Change me"""
+        pass
+
+    def tearDown(self):
+        """Change me"""
+        pass
+
+    @raises(ValueError)
+    def test_init(self):
+        n = Name()
+
+    def test_name_adhoc(self):
+        n = Name(
+            romanized='Moontown',
+            attested='Moontown',
+            wikipedia='https://en.wikipedia.org/wiki/Moontown,_Alabama')
+        assert_equal(['Moontown'], n.romanized)
+        assert_equal('Moontown', n.attested)
+        assert_equal('moontown', n.id)
+        assert_equal('https://en.wikipedia.org/wiki/Moontown,_Alabama', n.wikipedia)
 
 
