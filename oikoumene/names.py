@@ -7,6 +7,7 @@ Names
 from collections.abc import Sequence, Set
 import logging
 from oikoumene.base import Base
+from oikoumene.serialization import Serializeable
 from pprint import pformat
 from slugify import slugify
 from textnorm import normalize_space, normalize_unicode
@@ -17,7 +18,7 @@ logger = logging.getLogger(__name__)
 def norm(v):
     return normalize_unicode(normalize_space(v), 'NFC')
 
-class Name(Base):
+class Name(Base, Serializeable):
     """A Geographic Name"""
     def __init__(
         self,
@@ -28,6 +29,7 @@ class Name(Base):
     ):
 
         Base.__init__(self)
+        Serializeable.__init__(self)
         if not romanized:
             raise ValueError(
                 f'At least one romanized name form must be provided to initialize a Name.')

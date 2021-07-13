@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """Test oikoumene/names module"""
 
+import json
 import logging
 from nose.tools import assert_equal, assert_false, assert_true, raises
 from oikoumene.names import Name
@@ -101,7 +102,27 @@ class Test_Name(TestCase):
         assert_equal(2, len(prior))
         assert_true(prior[0].startswith('Name.'))
         assert_equal('moontown', prior[1])
-        
+
+    def test_json(self):
+        n = Name(
+            romanized='Moontown',
+            attested='Moontown',
+            wikipedia='https://en.wikipedia.org/wiki/Moontown,_Alabama')
+        j = n.json()
+        d = json.loads(j)
+        assert_equal(6, len(d))
+        assert_equal(
+            ['attested', 'id', 'object_type', 'prior_ids', 'romanized', 'wikipedia'],
+            sorted(list(d.keys())))
+        expected = {
+            'attested': 'Moontown',
+            'id': 'moontown',
+            'object_type': 'Name',
+            'romanized': ['Moontown'],
+            'wikipedia': 'https://en.wikipedia.org/wiki/Moontown,_Alabama'}
+        for k, v in expected.items():
+            assert_equal(v, d[k])
+        assert_true(d['prior_ids'][0].startswith('Name.'))
 
 
 
