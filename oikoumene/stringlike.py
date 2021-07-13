@@ -25,6 +25,7 @@ class CitedString(Base, Serializeable):
         attested: str='',
         romanized: Union[Sequence[str], Set[str]]=[],
         cleanup: bool=True,
+        **kwargs
     ):
         Base.__init__(self)
         Serializeable.__init__(self)
@@ -34,6 +35,8 @@ class CitedString(Base, Serializeable):
         self._cleanup = cleanup
         self.attested = attested
         self.romanized = romanized
+        for kw, arg in kwargs.items():
+            setattr(self, kw, arg)
 
     # attested form of the string (i.e., appears in a witness)
     @property
@@ -117,7 +120,7 @@ class CitedString(Base, Serializeable):
             self.id = slug
 
 
-class Name(CitedString):
+class GeographicName(CitedString):
     """A Geographic Name"""
     def __init__(
         self,
@@ -126,9 +129,7 @@ class Name(CitedString):
         cleanup: bool=True,
         **kwargs
     ):
-        CitedString.__init__(self, attested, romanized, cleanup)
-        for kw, arg in kwargs.items():
-            setattr(self, kw, arg)
+        CitedString.__init__(self, attested, romanized, cleanup, **kwargs)
 
 
         

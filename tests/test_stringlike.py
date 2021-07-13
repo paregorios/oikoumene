@@ -5,7 +5,7 @@
 import json
 import logging
 from nose.tools import assert_equal, assert_false, assert_true, raises
-from oikoumene.stringlike import CitedString, Name
+from oikoumene.stringlike import CitedString, GeographicName
 from pathlib import Path
 from pprint import pprint
 from unittest import TestCase
@@ -118,7 +118,18 @@ class Test_CitedString(TestCase):
             assert_equal(v, d[k])
         assert_true(d['prior_ids'][0].startswith('CitedString.'))
 
-class Test_Name(TestCase):
+    def test_adhoc_field(self):
+        n = CitedString(
+            romanized='Moontown',
+            attested='Moontown',
+            wikipedia='https://en.wikipedia.org/wiki/Moontown,_Alabama')
+        assert_equal(['Moontown'], n.romanized)
+        assert_equal('Moontown', n.attested)
+        assert_equal('moontown', n.id)
+        assert_equal('https://en.wikipedia.org/wiki/Moontown,_Alabama', n.wikipedia)
+
+
+class Test_GeographicName(TestCase):
 
     def setUp(self):
         """Change me"""
@@ -130,16 +141,7 @@ class Test_Name(TestCase):
 
     @raises(ValueError)
     def test_init(self):
-        n = Name()
+        n = GeographicName()
 
-    def test_name_adhoc(self):
-        n = Name(
-            romanized='Moontown',
-            attested='Moontown',
-            wikipedia='https://en.wikipedia.org/wiki/Moontown,_Alabama')
-        assert_equal(['Moontown'], n.romanized)
-        assert_equal('Moontown', n.attested)
-        assert_equal('moontown', n.id)
-        assert_equal('https://en.wikipedia.org/wiki/Moontown,_Alabama', n.wikipedia)
 
 
