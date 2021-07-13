@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Test oikoumene/names module"""
+"""Test oikoumene.stringlike module"""
 
 import json
 import logging
 from nose.tools import assert_equal, assert_false, assert_true, raises
-from oikoumene.names import Name
+from oikoumene.stringlike import Name
 from pathlib import Path
 from pprint import pprint
 from unittest import TestCase
