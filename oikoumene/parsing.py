@@ -21,14 +21,6 @@ class BaseParser:
     def __init__(self):
         pass
 
-    def _unique_id(self, gs: GeographicString, existing_ids: list):
-        if len(set(existing_ids).intersection([gs.id])) == 1:
-            similar = [i for i in existing_ids if i == gs.id or i.startswith(f'{gs.id}.')]
-            new_id = f'{gs.id}.{len(similar)}'
-            gs.id = new_id
-        return gs
-
-
 class DictParser(BaseParser):
 
     def __init__(self):
@@ -55,7 +47,7 @@ class DictParser(BaseParser):
                 else:
                     v['romanized'] = slugify(a, lowercase=False, separator=' ')
             gs = GeographicString(**v)
-            gs = self._unique_id(gs, list(results.keys()))
+            gs.make_unique_id(list(results.keys()))
             results[gs.id] = gs
         return results
 
@@ -91,7 +83,7 @@ class StringParser(BaseParser):
                 setattr(gs, self.output_fieldname, v)
             else:
                 gs = GeographicString(romanized=v)
-            gs = self._unique_id(gs, list(results.keys()))
+            gs.make_unique_id(list(results.keys()))
             results[gs.id] = gs
         return results
 

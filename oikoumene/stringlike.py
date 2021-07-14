@@ -36,23 +36,6 @@ class CitedString(Base, Serializeable):
         for kw, arg in kwargs.items():
             setattr(self, kw, arg)
 
-    @property
-    def id(self) -> str:
-        return self._id
-
-    @id.setter
-    def id(self, value: str):
-        if not isinstance(value, str):
-            raise TypeError(
-                f'Invalid type ({type(value)}) used to set "id". Expected {str}.')
-        valid_id = make_id_valid(value)
-        try:
-            self.prior_ids
-        except AttributeError:
-            self.prior_ids = set()
-        self.prior_ids.add(self._id)
-        self._id = valid_id
-
     # attested form of the string (i.e., appears in a witness)
     @property
     def attested(self) -> str:

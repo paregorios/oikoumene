@@ -28,31 +28,8 @@ def teardown_module():
 
 class Test_BaseParser(TestCase):
 
-    def test_unique_id(self):
+    def test_init(self):
         parser = BaseParser()
-        existing_ids = ['moontown']
-        gs = GeographicString(romanized='Moontown')
-        assert_equal('moontown', gs.id)
-        parser._unique_id(gs, existing_ids)
-        assert_equal('moontown.1', gs.id)
-
-    def test_unique_ids(self):
-        parser = BaseParser()
-        existing_ids = ['moontown', 'moontown.1', 'moontown-airport', 'hambrick-branch']
-        gs = GeographicString(romanized='Moontown')
-        assert_equal('moontown', gs.id)
-        parser._unique_id(gs, existing_ids)
-        assert_equal('moontown.2', gs.id)
-        existing_ids.append(gs.id)
-        gs = GeographicString(romanized='Minnow Creek')
-        assert_equal('minnow-creek', gs.id)
-        parser._unique_id(gs, existing_ids)
-        assert_equal('minnow-creek', gs.id)
-        existing_ids.append(gs.id)
-        gs = GeographicString(romanized='Moontown')
-        assert_equal('moontown', gs.id)
-        parser._unique_id(gs, existing_ids)
-        assert_equal('moontown.3', gs.id)
 
 class Test_StringParser(TestCase):
 
