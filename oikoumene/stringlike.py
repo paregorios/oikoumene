@@ -7,16 +7,14 @@ Names
 from collections.abc import Sequence, Set
 import logging
 from oikoumene.base import Base
+from oikoumene.id import make_id_valid
+from oikoumene.normalization import norm
 from oikoumene.serialization import Serializeable
 from pprint import pformat
 from slugify import slugify
-from textnorm import normalize_space, normalize_unicode
 from typing import List, Union
 
 logger = logging.getLogger(__name__)
-
-def norm(v):
-    return normalize_unicode(normalize_space(v), 'NFC')
 
 class CitedString(Base, Serializeable):
 
@@ -44,18 +42,16 @@ class CitedString(Base, Serializeable):
 
     @id.setter
     def id(self, value: str):
-        if self._cleanup:
-            val = norm(value)
-            if val == '':
-                raise ValueError(val)
-        else:
-            val = value
+        if not isinstance(value, str):
+            raise TypeError(
+                f'Invalid type ({type(value)}) used to set "id". Expected {str}.')
+        valid_id = make_id_valid(value)
         try:
             self.prior_ids
         except AttributeError:
             self.prior_ids = set()
         self.prior_ids.add(self._id)
-        self._id = val
+        self._id = valid_id
 
     # attested form of the string (i.e., appears in a witness)
     @property

@@ -4,33 +4,81 @@
 Parsing Mixins and Utility Classes
 """
 
+from collections.abc import Sequence
+from io import StringIO, TextIOWrapper
 import json
 import logging
 from oikoumene.stringlike import GeographicString
 from pathlib import Path
+from pprint import pformat
 from slugify import slugify
 from typing import TextIO, Union
 
 logger = logging.getLogger(__name__)
 
-class StringParser:
+class BaseParser:
+
+    def __init__(self):
+        pass
+
+    def _unique_id(self, gs: GeographicString, existing_ids: list):
+        if len(set(existing_ids).intersection([gs.id])) == 1:
+            similar = [i for i in existing_ids if i == gs.id or i.startswith(f'{gs.id}.')]
+            new_id = f'{gs.id}.{len(similar)}'
+            gs.id = new_id
+        return gs
+
+
+class DictParser(BaseParser):
+
+    def __init__(self):
+        BaseParser.__init__(self)
+
+    def parse(self, source: Union[dict, Sequence[dict]]):
+        if isinstance(source, dict):
+            values = [source]
+        elif isinstance(source, Sequence):
+            values = list(source)
+        else:
+            raise TypeError(
+                f'Unexpected type ({type(source)}) for "source" argument to parse method. '
+                f'Expected {dict} or a sequence of {dict}.')
+        results = {}
+        for v in values:
+            try:
+                v['romanized']
+            except KeyError:
+                try:
+                    a = v['attested']
+                except KeyError:
+                    pass  # let the GeographicString constructor handle the omission
+                else:
+                    v['romanized'] = slugify(a, lowercase=False, separator=' ')
+            gs = GeographicString(**v)
+            gs = self._unique_id(gs, list(results.keys()))
+            results[gs.id] = gs
+        return results
+
+class StringParser(BaseParser):
 
     def __init__(
         self,
         delimiter=',',
         output_fieldname='attested'
     ):
+        BaseParser.__init__(self)
         self.delimiter = delimiter
         self.output_fieldname = output_fieldname
 
-    def parse(self, source: Union[TextIO, Path, str, bytes], encoding='utf-8'):
+
+    def parse(self, source: Union[TextIOWrapper, StringIO, Path, str, bytes], encoding='utf-8'):
         if isinstance(source, Path):
             values = self._read_file(source, encoding)
         elif isinstance(source, str):
             values = source
         elif isinstance(source, bytes):
             values = source.decode(encoding)
-        elif isinstance(source, TextIO):
+        elif isinstance(source, (TextIOWrapper, StringIO)):
             values = ''.join(source.readlines())
         else:
             raise TypeError(
@@ -43,18 +91,9 @@ class StringParser:
                 setattr(gs, self.output_fieldname, v)
             else:
                 gs = GeographicString(romanized=v)
-            try:
-                results[gs.id]
-            except KeyError:
-                results[gs.id] = gs
-            else:
-                similar = [k for k in results.keys() if k.startswith(gs.id)]
-                new_id = f'{gs.id}-{len(similar)}'
-                gs.id = new_id
-                results[gs.id] = gs
+            gs = self._unique_id(gs, list(results.keys()))
+            results[gs.id] = gs
         return results
-
-
 
     def _read_file(self, path: Path, encoding: str):
         with open(path, 'r', encoding=encoding) as fp:

@@ -99,6 +99,24 @@ class Test_CitedString(TestCase):
         assert_true(prior[0].startswith('CitedString.'))
         assert_equal('moontown', prior[1])
 
+    def test_id_set(self):
+        n = CitedString(romanized='Moontown Airport')
+        assert_equal('moontown-airport', n.id)
+        n.id = '3M5'
+        assert_equal('_3M5', n.id)
+
+    @raises(ValueError)
+    def test_id_set_empty(self):
+        n = CitedString(romanized='Moontown Airport')
+        assert_equal('moontown-airport', n.id)
+        n.id = '     '
+
+    @raises(TypeError)
+    def test_id_set_bad(self):
+        n = CitedString(romanized='Moontown Airport')
+        assert_equal('moontown-airport', n.id)
+        n.id = 12345
+
     def test_json(self):
         n = CitedString(
             romanized='Moontown',
