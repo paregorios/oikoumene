@@ -18,9 +18,11 @@ class Place:
 class Gazetteer:
     """A collection of Place, GeographicName, and GeographicString objects"""
 
-    def __init__(self, objs: Union[Sequence[Union[Place, GeographicName, GeographicString]], Place, GeographicName, GeographicString]):
+    def __init__(self, objs: Union[Sequence[Union[Place, GeographicName, GeographicString]], Place, GeographicName, GeographicString]=None):
         self.supported = (Place, GeographicName, GeographicString)
         self.contents = {}
+        if objs is None:
+            return
         fail = tuple()
         if isinstance(objs, (list, tuple)):
             items = {}
@@ -63,6 +65,7 @@ class Gazetteer:
             # index?
         else:
             obj.make_unique_id(list(self.contents.keys()))
+            self.contents[obj.id] = obj
 
     def get(self, id: str):
         pass
