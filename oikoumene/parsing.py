@@ -8,11 +8,11 @@ from collections.abc import Sequence
 from io import StringIO, TextIOWrapper
 import json
 import logging
-from oikoumene.stringlike import GeographicString
+from oikoumene.stringlike import GeographicName, GeographicString
 from pathlib import Path
-from pprint import pformat
+from pprint import pformat, pprint
 from slugify import slugify
-from typing import TextIO, Union
+from typing import TextIO, Type, Union
 
 logger = logging.getLogger(__name__)
 
@@ -23,10 +23,11 @@ class BaseParser:
 
 class DictParser(BaseParser):
 
-    def __init__(self):
+    def __init__(self, output_type: Union[Type[GeographicString], Type[GeographicName]]=GeographicString):
         BaseParser.__init__(self)
+        self.output_type = output_type
 
-    def parse(self, source: Union[dict, Sequence[dict]]):
+    def parse(self, source: Union[dict, Sequence[dict]]) -> Union[Type[GeographicString], Type[GeographicName]]:
         if isinstance(source, dict):
             values = [source]
         elif isinstance(source, Sequence):
@@ -46,7 +47,7 @@ class DictParser(BaseParser):
                     pass  # let the GeographicString constructor handle the omission
                 else:
                     v['romanized'] = slugify(a, lowercase=False, separator=' ')
-            gs = GeographicString(**v)
+            gs = self.output_type(**v)
             gs.make_unique_id(list(results.keys()))
             results[gs.id] = gs
         return results
@@ -55,15 +56,16 @@ class StringParser(BaseParser):
 
     def __init__(
         self,
-        delimiter=',',
-        output_fieldname='attested'
+        delimiter: str=',',
+        output_type: Union[Type[GeographicString], Type[GeographicName]]=GeographicString,
+        output_fieldname: str='attested'
     ):
         BaseParser.__init__(self)
         self.delimiter = delimiter
+        self.output_type = output_type
         self.output_fieldname = output_fieldname
 
-
-    def parse(self, source: Union[TextIOWrapper, StringIO, Path, str, bytes], encoding='utf-8'):
+    def parse(self, source: Union[TextIOWrapper, StringIO, Path, str, bytes], encoding='utf-8') -> Union[Type[GeographicString], Type[GeographicName]]:
         if isinstance(source, Path):
             values = self._read_file(source, encoding)
         elif isinstance(source, str):
@@ -79,10 +81,10 @@ class StringParser(BaseParser):
         results = {}
         for v in values.split(self.delimiter):
             if self.output_fieldname != 'romanized':
-                gs = GeographicString(romanized=slugify(v, lowercase=False, separator=' '))
+                gs = self.output_type(romanized=slugify(v, lowercase=False, separator=' '))
                 setattr(gs, self.output_fieldname, v)
             else:
-                gs = GeographicString(romanized=v)
+                gs = self.output_type(romanized=v)
             gs.make_unique_id(list(results.keys()))
             results[gs.id] = gs
         return results

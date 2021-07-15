@@ -6,7 +6,7 @@ from io import StringIO
 import logging
 from nose.tools import assert_equal, assert_false, assert_true, raises
 from oikoumene.parsing import BaseParser, DictParser, StringParser
-from oikoumene.stringlike import norm, GeographicString
+from oikoumene.stringlike import norm, GeographicName, GeographicString
 from pathlib import Path
 from pprint import pprint
 from slugify import slugify
@@ -48,10 +48,19 @@ class Test_StringParser(TestCase):
         parser = StringParser(output_fieldname='romanized')
         s = 'Moontown, Cedar Mountain, Chestnut Knob, Hambrick Branch, Moontown Airport'
         geostrings = parser.parse(s)
+        for id, gs in geostrings.items():
+            assert_true(isinstance(gs, GeographicString))
         assert_equal(5, len(geostrings))
         expected = {slugify(part): norm(part) for part in s.split(',')}
         for k, v in expected.items():
             assert_equal([v], geostrings[k].romanized)
+
+    def test_parse_string_to_names(self):
+        parser = StringParser(output_fieldname='romanized', output_type=GeographicName)
+        s = 'Moontown, Cedar Mountain, Chestnut Knob, Hambrick Branch, Moontown Airport'
+        geonames = parser.parse(s)
+        for id, gn in geonames.items():
+            assert_true(isinstance(gn, GeographicName))
 
     def test_parse_bytes(self):
         parser = StringParser(output_fieldname='romanized')
