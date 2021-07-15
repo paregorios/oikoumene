@@ -87,4 +87,9 @@ class Test_Gazetteer(TestCase):
         g.add(gs)
         assert_equal(6, len(g.contents))
 
+    def test_json(self):
+        g = Gazetteer(self.geostrings)
+        j = g.json()
+        pprint(j, indent=4)
+
 

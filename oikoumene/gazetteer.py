@@ -5,6 +5,7 @@ Gazetteer
 """
 
 import logging
+from oikoumene.serialization import Serializeable
 from oikoumene.stringlike import GeographicName, GeographicString
 from typing import Union, Sequence
 
@@ -15,11 +16,11 @@ class Place:
     def __init__(self):
         pass
 
-class Gazetteer:
+class Gazetteer(Serializeable):
     """A collection of Place, GeographicName, and GeographicString objects"""
 
     def __init__(self, objs: Union[Sequence[Union[Place, GeographicName, GeographicString]], Place, GeographicName, GeographicString]=None):
-        self.supported = (Place, GeographicName, GeographicString)
+        self._supported = (Place, GeographicName, GeographicString)
         self.contents = {}
         if objs is None:
             return
@@ -27,7 +28,7 @@ class Gazetteer:
         if isinstance(objs, (list, tuple)):
             items = {}
             for o in objs:
-                if isinstance(o, self.supported):
+                if isinstance(o, self._supported):
                     items[o.id] = o
                 else:
                     fail = o
@@ -35,7 +36,7 @@ class Gazetteer:
         elif isinstance(objs, dict):
             items = {}
             for id, o in objs.items():
-                if isinstance(o, self.supported):
+                if isinstance(o, self._supported):
                     items[id] = o
                 else:
                     fail = o
@@ -49,7 +50,7 @@ class Gazetteer:
         if fail:
             raise TypeError(
                 f'Unexpected type ({type(fail)}) in {type(objs)} passed to Gazetteer initialization. '
-                f'Expected one of ({self.supported}).')
+                f'Expected one of ({self._supported}).')
         for id, o in items.items():
             self.add(o)
 
