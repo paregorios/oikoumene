@@ -90,6 +90,5 @@ class Test_Gazetteer(TestCase):
     def test_json(self):
         g = Gazetteer(self.geostrings)
         j = g.json()
-        pprint(j, indent=4)
 
 
