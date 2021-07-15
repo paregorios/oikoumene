@@ -109,13 +109,13 @@ class CitedString(Base, Serializeable):
         if not base:
             base = self.romanized[0]
         slug = slugify(base)
-        if slug != self._id:
+        if slug != self.id:
             try:
                 self.prior_ids
             except AttributeError:
                 self.prior_ids = set()
-            self.prior_ids.add(self._id)
-            self._id = slug
+            self.prior_ids.add(self.id)
+            self.id = slug
 
 class GeographicName(CitedString):
     """A Geographic Name"""
