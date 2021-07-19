@@ -11,9 +11,13 @@ Tested on Python 3.9.6 under OSX Mojave. Your mileage may vary. Pull requests fi
 
 With pip from pypi:
 
+*(to be added)*
+
+For development:
+
 ```bash
-pip install oikoumene
-```
+
+
 
 ## Quick Start
 
@@ -127,3 +131,5 @@ GeographicString: Ryland Pike
     "object_type": "Gazetteer"
 }
 ```
+
+Programmers can learn more by consulting the tests.
