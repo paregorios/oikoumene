@@ -152,7 +152,6 @@ class Test_Gazetteer(TestCase):
         sought = list(set(sought))
         for s in sought:
             assert_true(s in gaz_string)
-        print(gaz_string)
 
     
             
