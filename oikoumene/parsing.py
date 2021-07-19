@@ -75,13 +75,14 @@ class StringParser(BaseParser):
         elif isinstance(source, bytes):
             values = source.decode(encoding)
         elif isinstance(source, (TextIOWrapper, StringIO)):
-            values = ''.join(source.readlines())
+            values = ''.join(source.readlines()).strip()
         else:
             raise TypeError(
                 f'Unexpected type ({type(source)}) for "source" argument to parse method. '
                 f'Expected {TextIO}, {Path}, {str}, or {bytes}.')
         results = {}
         for v in values.split(self.delimiter):
+            logger.debug(f'v: {v}')
             if self.output_fieldname != 'romanized':
                 gs = self.output_type(romanized=slugify(v, lowercase=False, separator=' '))
                 setattr(gs, self.output_fieldname, v)
@@ -95,4 +96,4 @@ class StringParser(BaseParser):
         with open(path, 'r', encoding=encoding) as fp:
             lines = fp.readlines()
         del fp
-        return ''.join(lines)
+        return ''.join(lines).strip()
