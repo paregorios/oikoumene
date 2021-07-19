@@ -5,12 +5,14 @@
 from copy import deepcopy
 import json
 import logging
+from oikoumene.id import make_id_valid
 from oikoumene.stringlike import GeographicString
 from nose.tools import assert_equal, assert_false, assert_true, raises
 from oikoumene.gazetteer import Gazetteer
 from oikoumene.parsing import StringParser
 from pathlib import Path
 from pprint import pprint
+from slugify import slugify
 from unittest import TestCase
 
 logger = logging.getLogger(__name__)
@@ -92,12 +94,16 @@ class Test_Gazetteer(TestCase):
         g = Gazetteer(self.geostrings)
         j = g.json()
 
-    # def test_places(self):
-    #     path = Path('data/examples/moontown_names.json').resolve()
-    #     with open(path, 'r', encoding='utf-8') as f:
-    #         j = json.load(f)
-    #     del f
-    #     p = Gazetteer(j)
-
+    def test_stringlike_dict(self):
+        path = Path('data/examples/moontown_names.json').resolve()
+        with open(path, 'r', encoding='utf-8') as f:
+            j = json.load(f)
+        del f
+        gaz = Gazetteer(j)
+        assert_equal(20, len(gaz.contents))
+        ids = {make_id_valid(slugify(d['attested'])): d['attested'] for d in j}
+        for id, v in ids.items():
+            assert_equal(v, gaz.contents[id].attested) 
+            
 
 

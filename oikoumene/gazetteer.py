@@ -8,7 +8,7 @@ import logging
 from oikoumene.parsing import *
 from oikoumene.place import Place
 from oikoumene.serialization import Serializeable
-from oikoumene.stringlike import GeographicName, GeographicString
+from oikoumene.stringlike import Dict2StringlikeParser, GeographicName, GeographicString
 from typing import Union, Sequence
 
 logger = logging.getLogger(__name__)
@@ -19,6 +19,7 @@ class Gazetteer(Serializeable):
     def __init__(self, objs: Union[Sequence[Union[dict, Place, GeographicName, GeographicString]], dict, Place, GeographicName, GeographicString]=None):
         self._supported = (dict, Place, GeographicName, GeographicString)
         self.contents = {}
+        self._dict_parser = Dict2StringlikeParser()
         if objs is None:
             return
         fail = tuple()
@@ -27,11 +28,9 @@ class Gazetteer(Serializeable):
                 if not isinstance(o, self._supported):
                     fail = o
                     break
-                elif isinstance(o, dict):
-                    raise NotImplementedError()
-                    # parsed = self._dict_parser.parse(o)
-                    # for id, oo in parsed.items():
-                    #    self.add(oo)
+                elif isinstance(o, dict):                    
+                    parsed = self._dict_parser.parse_dict(o)
+                    self.add(parsed)
                 else:
                     self.add(o)
         elif isinstance(objs, dict):
