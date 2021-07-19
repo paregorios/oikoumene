@@ -13,10 +13,9 @@ With pip from pypi:
 
 *(to be added)*
 
-For development:
+For development, fork a copy on github if you like and clone it to your local machine. Then:
 
 ```bash
-git clone 
 cd oikoumene
 pip install -r requirements_dev.txt
 nosetests -x -s --nologcapture --with-coverage --cover-erase --cover-html --cover-html-dir=cover --cover-package=oikoumene
