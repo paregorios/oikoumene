@@ -11,7 +11,7 @@ from nose.tools import assert_equal, assert_false, assert_true, raises
 from oikoumene.gazetteer import Gazetteer
 from oikoumene.parsing import StringParser
 from pathlib import Path
-from pprint import pprint
+from pprint import pformat, pprint
 from slugify import slugify
 from unittest import TestCase
 
@@ -94,7 +94,7 @@ class Test_Gazetteer(TestCase):
         g = Gazetteer(self.geostrings)
         j = g.json()
 
-    def test_stringlike_dict(self):
+    def test_stringlike_dicts(self):
         path = Path('data/examples/moontown_names.json').resolve()
         with open(path, 'r', encoding='utf-8') as f:
             j = json.load(f)
@@ -103,7 +103,58 @@ class Test_Gazetteer(TestCase):
         assert_equal(20, len(gaz.contents))
         ids = {make_id_valid(slugify(d['attested'])): d['attested'] for d in j}
         for id, v in ids.items():
-            assert_equal(v, gaz.contents[id].attested) 
+            assert_equal(v, gaz.contents[id].attested)
+
+    def test_place_dicts(self):
+        path = Path('data/examples/moontown_places.json').resolve()
+        with open(path, 'r', encoding='utf-8') as f:
+            j = json.load(f)
+        del f
+        gaz = Gazetteer(j)
+        assert_equal(15, len(gaz.contents))
+        names = []
+        strings = []
+        for pid, place in gaz.contents.items():
+            names.extend([name.attested for nid, name in place.names.items()])
+            strings.extend([string.attested for sid, string in place.strings.items()])
+        assert_equal(17, len(names))
+        assert_equal(3, len(strings))
+        sought = []
+        for o in j:
+            for k in ['name', 'names', 'string', 'strings']:
+                vals = None
+                try:
+                    vals = o['name']
+                except KeyError:
+                    continue
+                if isinstance(vals, str):
+                    sought.append(vals)
+                elif isinstance(vals, list):
+                    sought.extend(vals)
+                else:
+                    raise RuntimeError()
+        sought = set(sought)
+        values = names + strings
+        values = set(values)
+        assert_false(sought.difference(values))
+
+    def test_str(self):
+        path = Path('data/examples/moontown_places.json').resolve()
+        with open(path, 'r', encoding='utf-8') as f:
+            j = json.load(f)
+        del f
+        gaz = Gazetteer(j)
+        gaz_string = str(gaz)
+        sought = []
+        for pid, place in gaz.contents.items():
+            sought.extend([name.attested for nid, name in place.names.items()])
+            sought.extend([string.attested for sid, string in place.strings.items()])
+        sought = list(set(sought))
+        for s in sought:
+            assert_true(s in gaz_string)
+        print(gaz_string)
+
+    
             
 
 

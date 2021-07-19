@@ -1,0 +1,68 @@
+[{
+        "object_type": "Place",
+        "name": "Flint River"
+    },
+    {
+        "object_type": "Place",
+        "name": "Moontown"
+    },
+    {
+        "object_type": "Place",
+        "name": "Sublett Cemetery"
+    },
+    {
+        "object_type": "Place",
+        "names": ["Hambrick Branch", "Minnow Creek"]
+    },
+    {
+        "object_type": "Place",
+        "name": "Chestnut Knob"
+    },
+
+    {
+        "object_type": "Place",
+        "name": "Lickskillet"
+    },
+    {
+        "object_type": "Place",
+        "names": ["Berry Road"]
+    },
+    {
+        "object_type": "Place",
+        "names": [
+            "Moontown Airport",
+            "3M5",
+            "Madison County Skypark",
+            { "attested": "فرودگاه مونتاون", "romanized": ["frwdgh mwntwn", "frudgah muntaun", "frūdgāh mūntāūn"] }
+        ],
+        "string": "Landing Strip"
+    },
+    {
+        "object_type": "Place",
+        "name": "Bob Hunt Road"
+    },
+    {
+        "object_type": "Place",
+        "name": "Moontown Road"
+    },
+    {
+        "object_type": "Place",
+        "name": "Sublett Bluff"
+    },
+    {
+        "object_type": "Place",
+        "string": "The Saddle"
+    },
+    {
+        "object_type": "Place",
+        "name": "Cedar Mountain"
+    },
+    {
+        "object_type": "Place",
+        "string": "The Mountain"
+    },
+    {
+        "object_type": "Place",
+        "name": "North Alabama Canoe and Kayak"
+    }
+]

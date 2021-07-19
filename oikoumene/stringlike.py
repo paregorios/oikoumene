@@ -209,6 +209,16 @@ class _CitedString(Base, Serializeable):
             self.prior_ids.add(self.id)
             self.id = slug
 
+    def __str__(self):
+        msg = []
+        if self.attested:
+            msg.append(self.attested)
+        if self.romanized:
+            romanized = [r for r in self.romanized if r != self.attested]
+            if romanized:
+                msg.append(f'({romanized[0]})')
+        return ' '.join(msg)
+        
 class GeographicName(_CitedString):
     """
     Represent data and behaviors associated with a geographic name.

@@ -82,6 +82,19 @@ class Place(Base, Serializeable):
             new_id = obj.make_unique_id(list(self.strings.keys()))
             self.strings[new_id] = obj
 
+    def __str__(self):
+        msg = []
+        msg.append(self.id)
+        names = [str(n) for id, n in self.names.items()]
+        if names:
+            names = '; '.join(sorted(names))
+            msg.append(f' Names: {names}')
+        strings = [str(s) for id, s in self.strings.items()]
+        if strings:
+            strings = '; '.join(sorted(strings))
+            msg.append(f' Strings: {strings}')
+        return '\n'.join(msg)
+
 class Dict2PlaceParser:
     """
     Convert a dictionary to a Place

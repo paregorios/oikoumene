@@ -6,7 +6,7 @@ Gazetteer
 
 import logging
 from oikoumene.parsing import *
-from oikoumene.place import Place
+from oikoumene.place import Dict2PlaceParser, Place
 from oikoumene.serialization import Serializeable
 from oikoumene.stringlike import Dict2StringlikeParser, GeographicName, GeographicString
 from typing import Union, Sequence
@@ -20,6 +20,7 @@ class Gazetteer(Serializeable):
         self._supported = (dict, Place, GeographicName, GeographicString)
         self.contents = {}
         self._dict_parser = Dict2StringlikeParser()
+        self._place_parser = Dict2PlaceParser()
         if objs is None:
             return
         fail = tuple()
@@ -28,8 +29,11 @@ class Gazetteer(Serializeable):
                 if not isinstance(o, self._supported):
                     fail = o
                     break
-                elif isinstance(o, dict):                    
-                    parsed = self._dict_parser.parse_dict(o)
+                elif isinstance(o, dict):
+                    try:
+                        parsed = self._dict_parser.parse_dict(o)
+                    except ValueError:
+                        parsed = self._place_parser.parse_dict(o)
                     self.add(parsed)
                 else:
                     self.add(o)
@@ -70,6 +74,12 @@ class Gazetteer(Serializeable):
 
     def remove(self, id:str):
         pass
+
+    def __str__(self):
+        msg = []
+        for id, data in self.contents.items():
+            msg.append(str(data))
+        return '\n'.join(msg)
 
 
 
