@@ -16,8 +16,11 @@ With pip from pypi:
 For development:
 
 ```bash
-
-
+git clone 
+cd oikoumene
+pip install -r requirements_dev.txt
+nosetests -x -s --nologcapture --with-coverage --cover-erase --cover-html --cover-html-dir=cover --cover-package=oikoumene
+```
 
 ## Quick Start
 
