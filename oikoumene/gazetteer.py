@@ -78,7 +78,10 @@ class Gazetteer(Serializeable):
     def __str__(self):
         msg = []
         for id, data in self.contents.items():
-            msg.append(str(data))
+            if isinstance(data, Place):
+                msg.append(str(data))
+            else:
+                msg.append(f'{type(data).__name__}: {str(data)}')
         return '\n'.join(msg)
 
 
