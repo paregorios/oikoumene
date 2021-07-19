@@ -5,44 +5,44 @@ Gazetteer
 """
 
 import logging
+from oikoumene.parsing import *
+from oikoumene.place import Place
 from oikoumene.serialization import Serializeable
 from oikoumene.stringlike import GeographicName, GeographicString
 from typing import Union, Sequence
 
 logger = logging.getLogger(__name__)
 
-class Place:
-
-    def __init__(self):
-        pass
-
 class Gazetteer(Serializeable):
     """A collection of Place, GeographicName, and GeographicString objects"""
 
-    def __init__(self, objs: Union[Sequence[Union[Place, GeographicName, GeographicString]], Place, GeographicName, GeographicString]=None):
-        self._supported = (Place, GeographicName, GeographicString)
+    def __init__(self, objs: Union[Sequence[Union[dict, Place, GeographicName, GeographicString]], dict, Place, GeographicName, GeographicString]=None):
+        self._supported = (dict, Place, GeographicName, GeographicString)
         self.contents = {}
         if objs is None:
             return
         fail = tuple()
         if isinstance(objs, (list, tuple)):
-            items = {}
             for o in objs:
-                if isinstance(o, self._supported):
-                    items[o.id] = o
-                else:
+                if not isinstance(o, self._supported):
                     fail = o
                     break
+                elif isinstance(o, dict):
+                    raise NotImplementedError()
+                    # parsed = self._dict_parser.parse(o)
+                    # for id, oo in parsed.items():
+                    #    self.add(oo)
+                else:
+                    self.add(o)
         elif isinstance(objs, dict):
-            items = {}
             for id, o in objs.items():
                 if isinstance(o, self._supported):
-                    items[id] = o
+                    self.add(o)
                 else:
                     fail = o
                     break
         elif isinstance(objs, (Place, GeographicName, GeographicString)):
-            items = {objs.id: objs}
+            self.add(objs)
         else:
             raise TypeError(
                 f'Unexpected type ({type(objs)}) passed to Gazetteer initialization. '
@@ -51,8 +51,6 @@ class Gazetteer(Serializeable):
             raise TypeError(
                 f'Unexpected type ({type(fail)}) in {type(objs)} passed to Gazetteer initialization. '
                 f'Expected one of ({self._supported}).')
-        for id, o in items.items():
-            self.add(o)
 
     def add(self, obj: Union[Place, GeographicName, GeographicString]):
         if not isinstance(obj, (Place, GeographicName, GeographicString)):

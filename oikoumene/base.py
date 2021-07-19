@@ -21,6 +21,8 @@ class Base:
             similar = [i for i in existing_ids if i == id or i.startswith(f'{id}.')]
             new_id = f'{id}.{len(similar)}'
             self.id = new_id
+            return new_id
+        return id
 
     @property
     def id(self) -> str:

@@ -5,9 +5,11 @@ Parsing Mixins and Utility Classes
 """
 
 from collections.abc import Sequence
+from copy import deepcopy
 from io import StringIO, TextIOWrapper
 import json
 import logging
+from oikoumene.place import Place
 from oikoumene.stringlike import GeographicName, GeographicString
 from pathlib import Path
 from pprint import pformat, pprint

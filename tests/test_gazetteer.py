@@ -3,6 +3,7 @@
 """Test Gazetteer module"""
 
 from copy import deepcopy
+import json
 import logging
 from oikoumene.stringlike import GeographicString
 from nose.tools import assert_equal, assert_false, assert_true, raises
@@ -47,7 +48,7 @@ class Test_Gazetteer(TestCase):
     @raises(TypeError)
     def test_init_dict_bad(self):
         gd = deepcopy(self.geostrings)
-        gd['integer'] = 7
+        gd['chickn'] = 7
         g = Gazetteer(gd)
 
     def test_init_list(self):
@@ -90,5 +91,13 @@ class Test_Gazetteer(TestCase):
     def test_json(self):
         g = Gazetteer(self.geostrings)
         j = g.json()
+
+    # def test_places(self):
+    #     path = Path('data/examples/moontown_names.json').resolve()
+    #     with open(path, 'r', encoding='utf-8') as f:
+    #         j = json.load(f)
+    #     del f
+    #     p = Gazetteer(j)
+
 
 
