@@ -63,3 +63,13 @@ Dict2StringlikeParser
     :members:
 
     .. automethod:: __init__
+
+StringParser
+------------
+.. currentmodule:: oikoumene.parsing
+.. autoclass:: StringParser
+    :members:
+
+    .. automethod:: __init__
+
+

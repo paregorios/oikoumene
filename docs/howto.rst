@@ -2,4 +2,4 @@
 How to use the *Oikoumene* gazetteer package
 ############################################
 
-foo bar
+.. include:: /howto/create.rst
