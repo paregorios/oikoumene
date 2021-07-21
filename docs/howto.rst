@@ -11,7 +11,6 @@ Use *Oikoumene* scripts at the command line
 Develop code with *Oikoumene*
 =============================
 
-.. include:: /dev/concepts.rst
 .. include:: /dev/create.rst
 .. include:: /dev/modify.rst
 

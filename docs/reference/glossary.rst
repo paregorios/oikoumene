@@ -1,18 +1,24 @@
-***********
-Definitions
-***********
+********
+Glossary
+********
 
 
 .. glossary::
 
+    event
+        A change or experience that occurs at discrete moments or durations in time and space. 
+
+        *Oikoumene* models events using the :py:class:`Event <oikoumene.event.Event>` class.
+        
     gazetteer
         A gazetteer is a geographical dictionary or directory, indexing places, toponyms, locations, and associated information. Gazetteers often serve as the focus, or as a critical component, of digital humanities publications and projects.
+
+        See also: :ref:`conceptual_discussion`.
         
         See further: Berman, Merrick Lex, et al., editors, *Placing Names: Enriching and Integrating Gazetteers.* Indiana University Press, 2016, http://www.worldcat.org/oclc/994713636, especially the "Introduction" and "Section I: What is a Gazetteer?", pp. 1-66.
 
         *Oikoumene* models gazetteers using the :py:class:`Gazetteer <oikoumene.gazetteer.Gazetteer>` class.
 
-    
     geographic name
         By "geographic name", we mean a :term:`string` that constitutes a toponym, placename, region/area name, and the like. If a modern, English-speaking cartographer would title-capitalize the name on a map or in a gazetteer, then it is probably a "geographic name". 
         

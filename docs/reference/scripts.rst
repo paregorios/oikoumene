@@ -1,6 +1,6 @@
-********************************
-Command-line interface (scripts)
-********************************
+*******
+Scripts
+*******
 
 .. _script_build_gazetteer:
 

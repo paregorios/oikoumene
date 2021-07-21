@@ -17,6 +17,7 @@ Use, create, and share gazetteers for humanities projects.
    :maxdepth: 2
    :caption: Contents:
 
+   Concepts <concepts>
    How to ... <howto>
    Reference <reference>
 
