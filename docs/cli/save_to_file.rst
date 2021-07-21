@@ -1,7 +1,7 @@
 .. _save_to_file:
 
 Save a gazetteer to a file 
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 When using the :ref:`script_build_gazetteer` script at the command line to create a gazetteer, the results can be saved to a file either by using your shell's IO redirection capabilities, e.g., 
 

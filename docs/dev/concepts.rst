@@ -1,0 +1,12 @@
+Concepts: Definitions and Classes
+---------------------------------
+
+Gazetteer content and associated *Oikoumene* class definitions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Defining the word "gazetteer" is notoriously difficult, at least for specialists. In some ways, "gazetteer" is an umbrella term for a variety of geographic or geospatial indexes, dictionaries, or directories that appeared first in print, sometimes to accompany or precede a map or atlas. More recently, "digital gazetteers" have adapted the category to new media and new functions, sometimes serving as standalone resources, other times facilitating reference functions for a digital library or other web application. The term has `special meaning <https://gate.ac.uk/sale/tao/splitch13.html>`_ in some computational contexts, such as Named Entity Recognition.
+
+*Oikoumene* is intended to support humanities scholars in collecting, exploring, managing, and analyzing onomastic, descriptive, historical, and geospatial information relevant to their research and teaching. As such, it responds to the agenda set out and explored in *Placing Names: Enriching and Integrating Gazetteers,* an important collection of papers edited by Merrick Lex Berman, Ruth Mostern, and Humphrey Southall. It was published in 2016 by Indiana University Press and is `widely available in academic libraries <http://www.worldcat.org/oclc/958121477>`_ and `in JSTOR <https://www.jstor.org/stable/j.ctt2005zq7>`_ and other digital library collections. *Oikoumene* users will benefit significantly from reading the book (especially the Introduction and early chapters).
+
+*Oikoumene* doesn't try to force you into creating a gazetteer that conforms to a particular format or specification. Rather, it aims to give you extensible building blocks for capturing, connecting, and annotating the kind of information that often goes into gazetteers in the spatial humanities, as well as mechanisms for importing and exporting it to various formats for use in other tools and environments. So, in *Oikoumene*, a gazetteer is simply a collection of geographic entities of interest. Every such entity must have an identifier that is unique within the gazetteer, but the gazetteer doesn't require anything more of the objects it contains. The package comes with definitions for four sorts of entities: geographic strings, geographic names, events, and places. They can be mixed and matched in the gazetteer as you refine your information and as befits your research approach and interests.
+
