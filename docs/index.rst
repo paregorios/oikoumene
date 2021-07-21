@@ -20,6 +20,7 @@ Use, create, and share gazetteers for humanities projects.
    Concepts <concepts>
    How to ... <howto>
    Reference <reference>
+   Use cases <use_cases>
 
 ##################
 Indices and tables
