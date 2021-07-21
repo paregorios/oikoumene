@@ -1,11 +1,24 @@
 import setuptools
+from pip._vendor.packaging.version import Version
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+# Get the version from the oikoumene module.
+oikoumene_version = None
+with open('oikoumene/__init__.py', 'r') as fp:
+    for line in fp:
+        if line.startswith("__version__"):
+            oikoumene_version = Version(
+                line.split("=")[1].strip().strip("\"'"))
+            break
+
+if not oikoumene_version:
+    raise ValueError("Could not determine Oikoumene's version")
+    
 setuptools.setup(
     name="oikoumene",
-    version="0.0.1",
+    version=oikoumene_version,
     author="Tom Elliott",
     author_email="tom.elliott@nyu.edu",
     description="gazetteer tools",
