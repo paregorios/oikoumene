@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Build a gazetteer from basic data
+Build a gazetteer from basic data.    
 """
 
 from airtight.cli import configure_commandline
@@ -26,7 +26,7 @@ OPTIONAL_ARGUMENTS = [
     ['-w', '--veryverbose', False,
         'very verbose output (logging level == DEBUG)', False],
     ['-i', '--input_file', '', 'path to input file', False],
-    ['-if', '--input_format', 'json', 'input file format', False],
+    ['-if', '--input_format', 'txt', 'input file format', False],
     ['-o', '--output_file', '', 'path to output file', False],
     ['-of', '--output_format', 'json', 'output file format', False]
 ]
