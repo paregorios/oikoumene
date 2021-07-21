@@ -7,7 +7,7 @@ Scripts
 build_gazetteer.py
 ------------------
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python scripts/build_gazetteer.py -h
     usage: build_gazetteer.py [-h] [-l LOGLEVEL] [-v] [-w] [-i INPUT_FILE] [-if INPUT_FORMAT] [-o OUTPUT_FILE] [-of OUTPUT_FORMAT]
