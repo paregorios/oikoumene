@@ -5,11 +5,14 @@ Glossary
 
 .. glossary::
 
+    ad hoc attributes
+        Data attributes (key:value pairs) that you add to an event, geographic name, geographic string, or place when it is created. *Oikoumene* does not provide any special functions or indexing for ad hoc attributes, but they are automatically read from, and written to, the default JSON serialization used by the package.
+        
     event
         A change or experience that occurs at discrete moments or durations in time and space. 
 
         *Oikoumene* models events using the :py:class:`Event <oikoumene.event.Event>` class.
-        
+
     gazetteer
         A gazetteer is a geographical dictionary or directory, indexing places, toponyms, locations, and associated information. Gazetteers often serve as the focus, or as a critical component, of digital humanities publications and projects.
 
