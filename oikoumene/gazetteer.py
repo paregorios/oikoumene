@@ -146,9 +146,17 @@ class Gazetteer(Serializeable):
         fields = {name: getattr(obj, name) for name in fields if getattr(obj, name)}
         return fields
 
-
     def remove(self, id:str):
-        pass
+        try:
+            self.contents[id]
+        except KeyError:
+            return
+        else:
+            self.contents.pop(id)
+            self._unindex(id)
+
+    def _unindex(self, id):
+        self._indexes['_all_text'].drop(id)
 
     def __str__(self):
         msg = []

@@ -164,6 +164,18 @@ class Test_Gazetteer(TestCase):
         entries = gaz.get({'text': ['moon']})
         assert_equal(3, len(entries))
 
-            
+    def test_remove(self):
+        path = Path('data/examples/moontown_names.json').resolve()
+        with open(path, 'r', encoding='utf-8') as f:
+            j = json.load(f)
+        del f
+        gaz = Gazetteer(j)
+        assert_equal(20, len(gaz.contents))
+        entries = gaz.get({'id': ['chestnut-knob']})
+        assert_equal(1, len(entries))
+        gaz.remove('chestnut-knob')
+        assert_equal(19, len(gaz.contents))
+        entries = gaz.get({'id': ['chestnut-knob']})
+        assert_equal(0, len(entries))
 
 

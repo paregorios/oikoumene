@@ -18,6 +18,7 @@ class StringIndex:
         self.phrases = {}
         self.words = {}
         self.substrings = {}
+        self.reverse = {}
 
     def add(self, value: str, ids: list):
         if not isinstance(value, str):
@@ -34,12 +35,25 @@ class StringIndex:
         self._add_words(real_value, real_ids)
         self._add_substrings(real_value, real_ids)
 
+    def _add_rev(self, ids, idx, value):
+        for id in ids:
+            try:
+                self.reverse[id]
+            except KeyError:
+                self.reverse[id] = {}
+            try:
+                self.reverse[id][idx]
+            except KeyError:
+                self.reverse[id][idx] = set()
+            self.reverse[id][idx].add(value)
+
     def _add_value(self, value, ids):
         try:
             self.values[value]
         except KeyError:
             self.values[value] = set()
         self.values[value].update(ids)
+        self._add_rev(ids, 'values', value)
 
     def _add_words(self, value, ids):   
         words = value.split()
@@ -49,6 +63,7 @@ class StringIndex:
             except KeyError:
                 self.words[word] = set()
             self.words[word].update(ids)
+            self._add_rev(ids, 'words', word)
 
     def _add_phrases(self, value, ids):
         words = value.split()
@@ -59,6 +74,7 @@ class StringIndex:
             except KeyError:
                 self.phrases[phrase] = set()
             self.phrases[phrase].update(ids)
+            self._add_rev(ids, 'phrases', phrase)
 
     def _add_substrings(self, value, ids):
         chars = list(value)
@@ -69,6 +85,22 @@ class StringIndex:
             except KeyError:
                 self.substrings[substring] = set()
             self.substrings[substring].update(ids)
+            self._add_rev(ids, 'substrings', substring)
+
+    def drop(self, ids: list):
+        if isinstance(ids, list):
+            real_ids = ids
+        elif isinstance(ids, str):
+            real_ids = [ids,]
+        else:
+            raise TypeError(type(ids))
+        for id in real_ids:
+            for idx_name, values in self.reverse[id].items():
+                idx = getattr(self, idx_name)
+                for value in values:
+                    idx[value].remove(id)
+                    if len(idx[value]) == 0:
+                        idx.pop(value)
 
     def get(self, values: list, indexes: list=['value', 'word', 'phrase', 'substring'], operator: str='and'):
         if isinstance(values, str):
