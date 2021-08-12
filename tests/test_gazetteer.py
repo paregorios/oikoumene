@@ -153,7 +153,17 @@ class Test_Gazetteer(TestCase):
         for s in sought:
             assert_true(s in gaz_string)
 
-    
+    def test_get(self):
+        path = Path('data/examples/moontown_names.json').resolve()
+        with open(path, 'r', encoding='utf-8') as f:
+            j = json.load(f)
+        del f
+        gaz = Gazetteer(j)
+        entries = gaz.get({'id': ['chestnut-knob']})
+        assert_equal(1, len(entries))
+        entries = gaz.get({'text': ['moon']})
+        assert_equal(3, len(entries))
+
             
 
 

@@ -5,11 +5,14 @@ Gazetteer
 """
 
 import logging
+from oikoumene.indexing import StringIndex
 from oikoumene.parsing import *
 from oikoumene.place import Dict2PlaceParser, Place
 from oikoumene.serialization import Serializeable
 from oikoumene.stringlike import Dict2StringlikeParser, GeographicName, GeographicString
 from typing import Union, Sequence
+from types import FunctionType
+from inspect import getmembers
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +22,9 @@ class Gazetteer(Serializeable):
     def __init__(self, objs: Union[Sequence[Union[dict, Place, GeographicName, GeographicString]], dict, Place, GeographicName, GeographicString]=None):
         self._supported = (dict, Place, GeographicName, GeographicString)
         self.contents = {}
+        self._indexes = {
+            '_all_text': StringIndex()
+        }
         self._dict_parser = Dict2StringlikeParser()
         self._place_parser = Dict2PlaceParser()
         if objs is None:
@@ -64,13 +70,82 @@ class Gazetteer(Serializeable):
             self.contents[obj.id]
         except KeyError:
             self.contents[obj.id] = obj
-            # index?
         else:
             obj.make_unique_id(list(self.contents.keys()))
             self.contents[obj.id] = obj
+        self.reindex(obj.id)
 
-    def get(self, id: str):
+    def get(self, criteria: dict=[], operator: str='and'):
+        results = dict()
+        for k, v in criteria.items():
+            results[k] = getattr(self,
+             f'_get_{k}')(v)
+        if len(results) < len(criteria) and operator ==  'and':
+            return {}
+        ids = None
+        for k, v in results.items():
+            if ids is None:
+                ids = set(v)
+            elif operator == 'and':
+                ids.intersection(v)
+            elif operator == 'or':
+                ids.union(v)
+            else:
+                raise NotImplementedError(operator)
+        entries = dict()
+        for id in ids:
+            entries[id] = self.contents[id]
+        return entries
+
+    def _get_id(self, ids):
+        return [id for id in ids if id in self.contents.keys()]
+
+    def _get_text(self, values):
+        return self._indexes['_all_text'].get(values, operator='or')
+
+    def merge(self, ids: list):
         pass
+
+    def reindex(self, ids: list):
+        if isinstance(ids, list):
+            real_ids = ids
+        elif isinstance(ids, str):
+            real_ids = [ids,]
+        else:
+            raise TypeError(type(ids))
+        for id in real_ids:
+            try:
+                obj = self.contents[id]
+            except KeyError:
+                raise ValueError(id)
+            self._reindex_this(obj, id)
+
+    def _reindex_this(self, obj, id):
+        if isinstance(obj, str):
+            self._indexes['_all_text'].add(obj, id)
+        elif isinstance(obj, list):
+            for o in obj:
+                self._reindex_this(o, id)
+        elif isinstance(obj, dict):
+            for k, v in obj.items():
+                self._reindex_this(v, id)
+        elif isinstance(obj, (GeographicName, GeographicString, Place)):
+            for k, v in self._get_indexable_fields(obj).items():
+                self._reindex_this(v, id)
+        else:
+            raise TypeError(type(obj))
+
+    def _get_indexable_fields(self, obj):
+        disallowed = {
+            name for name, value in getmembers(type(obj)) 
+                if isinstance(value, FunctionType)}
+        disallowed.update(['id', 'prior_ids'])
+        fields = [
+            name for name in dir(obj) 
+                if name[0] != '_' and name not in disallowed and hasattr(obj, name)]
+        fields = {name: getattr(obj, name) for name in fields if getattr(obj, name)}
+        return fields
+
 
     def remove(self, id:str):
         pass
