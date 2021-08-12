@@ -10,6 +10,7 @@ from oikoumene.stringlike import GeographicString
 from nose.tools import assert_equal, assert_false, assert_true, raises
 from oikoumene.gazetteer import Gazetteer
 from oikoumene.parsing import StringParser
+from oikoumene.place import Place
 from pathlib import Path
 from pprint import pformat, pprint
 from slugify import slugify
@@ -178,4 +179,24 @@ class Test_Gazetteer(TestCase):
         entries = gaz.get({'id': ['chestnut-knob']})
         assert_equal(0, len(entries))
 
-
+    def test_merge(self):
+        path = Path('data/examples/moontown_names.json').resolve()
+        with open(path, 'r', encoding='utf-8') as f:
+            j = json.load(f)
+        del f
+        gaz = Gazetteer(j)
+        assert_equal(20, len(gaz.contents))
+        merge_ids = ['_3-m5', 'landing-strip', 'madison-county-sky-park', 'moontown-airport']
+        gaz.merge(merge_ids)
+        assert_equal(17, len(gaz.contents))
+        misses = 0
+        for id in merge_ids:
+            try:
+                gaz.contents[id]
+            except KeyError:
+                misses += 1
+        assert_equal(4, misses)
+        entries = gaz.get({'text': ['sky', 'strip', 'airport', '3 M5']})
+        assert_equal(1, len(entries))
+        for id, obj in entries.items():
+            assert_true(isinstance(obj, Place))

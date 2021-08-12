@@ -104,7 +104,42 @@ class Gazetteer(Serializeable):
         return self._indexes['_all_text'].get(values, operator='or')
 
     def merge(self, ids: list):
-        pass
+        if isinstance(ids, str):
+            return self.contents[ids]
+        elif isinstance(ids, list):
+            pass
+        else:
+            raise TypeError(type(ids))
+        objs = [self.contents[id] for id in ids]
+        type_names = list(set([type(o).__name__ for o in objs]))
+        target_type = None
+        if 'Place' in type_names or len(type_names) > 1:
+            target_type = 'Place'
+        elif len(type_names) == 1 and type_names[0] in ['GeographicName', 'GeographicString']:
+            rset = set(objs[0].romanized)
+            for o in objs[1:]:
+                rset.intersection(o.romanized)
+            if len(rset) > 0:
+                target_type = type_names[0]
+            else:
+                target_type = 'Place'
+        else:
+            raise NotImplementedError(type_names)
+        _class = globals()[target_type]
+        target = _class()
+        for obj in objs:
+            target = getattr(self, f'_merge_{type(obj).__name__.lower()}_to_{target_type.lower()}')(target, obj)
+        self.add(target)
+        for id in ids:
+            self.remove(id)
+
+    def _merge_geographicname_to_place(self, target, gname):
+        target.add(gname)
+        return target
+
+    def _merge_geographicstring_to_place(self, target, gstring):
+        target.add(gstring)
+        return target
 
     def reindex(self, ids: list):
         if isinstance(ids, list):
