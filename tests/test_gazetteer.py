@@ -200,3 +200,23 @@ class Test_Gazetteer(TestCase):
         assert_equal(1, len(entries))
         for id, obj in entries.items():
             assert_true(isinstance(obj, Place))
+
+    def test_make_place(self):
+        path = Path('data/examples/moontown_names.json').resolve()
+        with open(path, 'r', encoding='utf-8') as f:
+            j = json.load(f)
+        del f
+        gaz = Gazetteer(j)
+        merge_ids = ['_3-m5', 'landing-strip', 'madison-county-sky-park', 'moontown-airport']
+        gaz.merge(merge_ids)
+        entries = gaz.get({'text': ['berry']})
+        merge_ids = list(entries.keys())
+        gaz.merge(merge_ids)
+        gaz.make_place([id for id, obj in gaz.contents.items() if not isinstance(obj, Place)])
+        assert_equal(16, len(gaz.contents))
+        for id, obj in gaz.contents.items():
+            assert_true(isinstance(obj, Place))
+        assert_equal(19, len(gaz._indexes['_all_text'].values))
+        
+        
+

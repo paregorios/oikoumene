@@ -4,6 +4,7 @@
 Gazetteer
 """
 
+from copy import deepcopy
 import logging
 from oikoumene.indexing import StringIndex
 from oikoumene.parsing import *
@@ -103,6 +104,20 @@ class Gazetteer(Serializeable):
     def _get_text(self, values):
         return self._indexes['_all_text'].get(values, operator='or')
 
+    def make_place(self, ids: list):
+        if isinstance(ids, list):
+            real_ids = ids
+        elif isinstance(ids, str):
+            real_ids = [ids,]
+        else:
+            raise TypeError(type(ids))
+        for id in real_ids:
+            target = Place()
+            obj = self.contents[id]
+            target = getattr(self, f'_merge_{type(obj).__name__.lower()}_to_place')(target, obj)
+            self.add(target)
+            self.remove(id)
+
     def merge(self, ids: list):
         if isinstance(ids, str):
             return self.contents[ids]
@@ -126,12 +141,35 @@ class Gazetteer(Serializeable):
         else:
             raise NotImplementedError(type_names)
         _class = globals()[target_type]
-        target = _class()
+        try:
+            target = _class()
+        except ValueError as err:
+            if 'At least one romanized or attested name form must be provided to initialize' in str(err):
+                target = objs[0]
+                objs = objs[1:]
+            else:
+                raise
         for obj in objs:
             target = getattr(self, f'_merge_{type(obj).__name__.lower()}_to_{target_type.lower()}')(target, obj)
         self.add(target)
         for id in ids:
             self.remove(id)
+
+    def _merge_geographicname_to_geographicname(self, target, gname):
+        if gname.attested and target.attested:
+            if gname.attested != target.attested:
+                raise RuntimeError(
+                    f'Cannot merge GeographicNames with differing attested forms '
+                    f'({target.attested} vs. {gname.attested}')
+        elif target.attested and not gname.attested:
+            pass
+        elif not target.attested and gname.attested:
+            target.attested = gname.attested
+        else:
+            raise RuntimeError("?")
+        for rname in gname.romanized:
+            target.romanized = rname
+        return target
 
     def _merge_geographicname_to_place(self, target, gname):
         target.add(gname)
