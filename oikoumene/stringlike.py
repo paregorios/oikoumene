@@ -187,6 +187,18 @@ class _CitedString(Base, Serializeable):
         if dirty:
             self._generate_id()
 
+    def strings(self):
+        result = self.attested
+        rlist = [n for n in self.romanized if n != self.attested]
+        if rlist:
+            if self.attested:
+                result += ' ('
+            rlist = ', '.join(rlist)
+            result += f'{rlist}'
+            if self.attested:
+                result += ')'
+        return result
+
     def _generate_id(self):
         """
         Make the most useful possible identifier for this object.

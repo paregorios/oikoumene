@@ -109,6 +109,7 @@ class StringIndex:
             real_values = values
         else:
             raise TypeError(type(values))
+        real_values = [v.lower() for v in real_values]
         results = {}
         for idx in indexes:
             r = getattr(self, f'_get_{idx}s')(real_values, operator)

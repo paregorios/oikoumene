@@ -79,8 +79,7 @@ class Gazetteer(Serializeable):
     def get(self, criteria: dict=[], operator: str='and'):
         results = dict()
         for k, v in criteria.items():
-            results[k] = getattr(self,
-             f'_get_{k}')(v)
+            results[k] = getattr(self, f'_get_{k}')(v)
         if len(results) < len(criteria) and operator ==  'and':
             return {}
         ids = None
