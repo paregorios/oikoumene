@@ -33,6 +33,15 @@ class Manager:
     def contents(self):
         return self._ordered_list(self.gaz.contents)
 
+    def drop(self):
+        """Erase the contents of the current gazetteer from memory."""
+        g = self.gaz
+        self.gaz = None
+        self._context = None
+        count = len(g.contents)
+        del g
+        return f'Erased current gazetteer from memory ({count} objects).'
+
     def find(self, search_string: str):
         entries = self.gaz.get({'text': search_string}, operator='or')
         return self._ordered_list(entries)

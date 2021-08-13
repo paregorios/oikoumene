@@ -24,7 +24,9 @@ class CLI:
             print(result)
 
     def _parse(self, parts: list=[], verb: str='', object: str='', options: list=[]):
-        if not verb and not object:
+        if verb and not object and len(parts) == 0:
+            return getattr(self, f'_{verb.lower()}')()
+        elif not verb and not object:
             m = rx_integer.match(parts[0])
             if m:
                 raise NotImplementedError()
@@ -39,7 +41,11 @@ class CLI:
         elif verb and object:
             return getattr(self, f'_{verb.lower()}')(object=object, options=options)
 
+    def _drop(self):
+        return self.manager.drop()
+
     def _load(self, object: str, options: list):
+        """Load a gazetteer from file."""
         format = ''
         if options:
             if len(options) == 1:

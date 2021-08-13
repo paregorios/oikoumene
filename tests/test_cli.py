@@ -31,10 +31,19 @@ class Test_CLI(TestCase):
         """Change me"""
         pass
 
-    def test_load_txt(self):
+    def test_load(self):
         path = test_data_path / 'strings.txt'
         cmd = f'load {path}'
         r = self.cli._parse(cmd.split())
         assert_true(r.startswith('Read 5 objects from '))
         assert_true(r.endswith('oikoumene/tests/data/strings.txt.'))
         assert_equal(5, len(self.cli.manager.gaz.contents))
+        cmd = f'drop'
+        r = self.cli._parse(cmd.split())
+        assert_equal('Erased current gazetteer from memory (5 objects).', r)
+        path = test_data_path / 'moontown_names.json'
+        cmd = f'load {path}'
+        r = self.cli._parse(cmd.split())
+        assert_true(r.startswith('Read 20 objects from '))
+        assert_true(r.endswith('oikoumene/tests/data/moontown_names.json.'))
+        assert_equal(20, len(self.cli.manager.gaz.contents))
