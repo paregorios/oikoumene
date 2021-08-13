@@ -31,10 +31,14 @@ class Manager:
         return '\n'.join([f'{k}: {v}' for k, v in self._context.items()])
 
     def contents(self):
+        if self.gaz is None:
+            return 'No gazetteer is loaded.'
         return self._ordered_list(self.gaz.contents)
 
     def drop(self):
         """Erase the contents of the current gazetteer from memory."""
+        if self.gaz is None:
+            return 'No gazetteer is loaded.'
         g = self.gaz
         self.gaz = None
         self._context = None
@@ -43,15 +47,21 @@ class Manager:
         return f'Erased current gazetteer from memory ({count} objects).'
 
     def find(self, search_string: str):
+        if self.gaz is None:
+            return 'No gazetteer is loaded.'
         entries = self.gaz.get({'text': search_string}, operator='or')
         return self._ordered_list(entries)
 
     def json(self):
         """Get JSON representation of gazetteer."""
+        if self.gaz is None:
+            return 'No gazetteer is loaded.'
         return self.gaz.json()
 
     def len(self):
         """Get number of objects in the gazetteer."""
+        if self.gaz is None:
+            return 'No gazetteer is loaded.'
         return f'There are {len(self.gaz.contents)} objects in the gazetteer.'
 
     def load(self, input_path: str, input_format: str='json'):
@@ -76,6 +86,8 @@ class Manager:
 
     def save(self, output_path: str, output_format: str='json'):
         """Save a gazetteer to file."""
+        if self.gaz is None:
+            return 'No gazetteer is loaded.'
         if output_format == 'json':
             result = self.gaz.json()
         elif output_format == 'txt':
@@ -90,6 +102,8 @@ class Manager:
 
     def str(self):
         """Get string representation of gazetteer."""
+        if self.gaz is None:
+            return 'No gazetteer is loaded.'
         return str(self.gaz)
 
 

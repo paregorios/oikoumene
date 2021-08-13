@@ -26,7 +26,12 @@ class CLI:
 
     def _parse(self, parts: list=[], verb: str='', object: str='', options: list=[]):
         if verb and not object and len(parts) == 0:
-            return getattr(self, f'_v_{verb.lower()}')()
+            try:
+                return getattr(self, f'_v_{verb.lower()}')()
+            except TypeError:
+                return 'Syntax error:\n' + self._usage(verb)
+            except AttributeError:
+                return f'Unknown command "{verb}". Type "help" for list of commands.'
         elif not verb and not object:
             m = rx_integer.match(parts[0])
             if m:
@@ -40,7 +45,44 @@ class CLI:
             else:
                 return self._parse(verb=verb, object=parts[-1], options=parts[:-1])
         elif verb and object:
-            return getattr(self, f'_v_{verb.lower()}')(object=object, options=options)
+            try:
+                return getattr(self, f'_v_{verb.lower()}')(object=object, options=options)
+            except TypeError:
+                return 'Syntax error:\n' + self._usage(verb)
+            except AttributeError:
+                return f'Unknown command "{verb}"". Type "help" for list of commands.'
+
+    def _usage(self, verb: str):
+        v = verb.lower()
+        doc = getdoc(getattr(self, f'_v_{v}'))
+        try:
+            usage = getattr(self, f'_usage_{v}')()
+        except AttributeError:
+            usage = []
+        if usage:
+            usage.insert(0, '\n  Usage:')
+            usage = '\n  '.join(usage)
+        else:
+            usage = ''
+        msg = f'{v}: {doc}' + usage
+        return msg.strip()
+
+    def _usage_find(self):
+        return [
+            'find {search string}+'
+        ]
+
+    def _usage_load(self):
+        return [
+            'load {filepath}',
+            'load {filepath} {format=json|txt}'
+        ]
+
+    def _usage_save(self):
+        return [
+            'save {filepath}',
+            'save {filepath} {format=json|txt}'
+        ]
 
     def _v_contents(self):
         """List contents of the gazetteer."""
@@ -56,14 +98,17 @@ class CLI:
             raise NotImplementedError(options)
         return self.manager.find(object)
 
-    def _v_help(self):
+    def _v_help(self, object: str='', options: list=[]):
         """List available commands."""
-        methods = [k for k in dir(self) if k.startswith('_v_')]
-        entries = [(k.split('_')[-1], getdoc(getattr(self, k))) for k in methods]
-        entries.sort(key=lambda x: x[0])
-        longest = max([len(e[0]) for e in entries])
-        entries = [f'{e[0]}:'.rjust(longest+1) + f' {e[1]}' for e in entries]
-        return '\n'.join(entries)
+        if object:
+            return self._usage(object)
+        else:
+            methods = [k for k in dir(self) if k.startswith('_v_')]
+            entries = [(k.split('_')[-1], getdoc(getattr(self, k))) for k in methods]
+            entries.sort(key=lambda x: x[0])
+            longest = max([len(e[0]) for e in entries])
+            entries = [f'{e[0]}:'.rjust(longest+1) + f' {e[1]}' for e in entries]
+            return '\n'.join(entries)
 
     def _v_json(self):
         """List gazetteer contents in JSON format (see "save" to write to file)."""
@@ -83,15 +128,18 @@ class CLI:
                 raise NotImplementedError(options)            
         else:
             format = object.split('.')[-1]
-        return self.manager.load(object, format)
+        try:
+            return self.manager.load(object, format)
+        except FileNotFoundError as err:
+            return str(err)
 
     def _v_list(self):
         """List contents of the gazetteer."""
-        return self._contents()
+        return self._v_contents()
 
     def _v_ls(self):
         """List contents of the gazetteer."""
-        return self._contents()
+        return self._v_contents()
 
     def _v_save(self, object: str, options: list):
         """Save gazetteer content to a file."""
@@ -104,5 +152,13 @@ class CLI:
         else:
             format = object.split('.')[-1]
         return self.manager.save(object, format)
+
+    def _v_q(self):
+        """Quit interactive interface."""
+        self._v_quit()
+
+    def _v_quit(self):
+        """Quit interactive interface."""
+        exit()
 
         
