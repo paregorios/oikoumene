@@ -31,6 +31,11 @@ class Test_CLI(TestCase):
         """Change me"""
         pass
 
+    def test_help(self):
+        cmd = 'help'
+        r = self.cli._parse([cmd,])
+        assert_true('contents: ' in r)
+
     def test_load(self):
         path = test_data_path / 'strings.txt'
         cmd = f'load {path}'

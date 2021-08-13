@@ -4,6 +4,7 @@
 Command Line Interface
 """
 
+from inspect import getdoc
 import logging
 from oikoumene.normalization import norm
 from oikoumene.manager import Manager
@@ -25,7 +26,7 @@ class CLI:
 
     def _parse(self, parts: list=[], verb: str='', object: str='', options: list=[]):
         if verb and not object and len(parts) == 0:
-            return getattr(self, f'_{verb.lower()}')()
+            return getattr(self, f'_v_{verb.lower()}')()
         elif not verb and not object:
             m = rx_integer.match(parts[0])
             if m:
@@ -39,13 +40,27 @@ class CLI:
             else:
                 return self._parse(verb=verb, object=parts[-1], options=parts[:-1])
         elif verb and object:
-            return getattr(self, f'_{verb.lower()}')(object=object, options=options)
+            return getattr(self, f'_v_{verb.lower()}')(object=object, options=options)
 
-    def _drop(self):
+    def _v_contents(self):
+        """List contents of the gazetteer."""
+        return self.manager.contents()
+
+    def _v_drop(self):
+        """Erase contents of the gazetteer from memory."""
         return self.manager.drop()
 
-    def _load(self, object: str, options: list):
-        """Load a gazetteer from file."""
+    def _v_help(self):
+        """List available commands."""
+        methods = [k for k in dir(self) if k.startswith('_v_')]
+        entries = [(k.split('_')[-1], getdoc(getattr(self, k))) for k in methods]
+        entries.sort(key=lambda x: x[0])
+        longest = max([len(e[0]) for e in entries])
+        entries = [f'{e[0]}:'.rjust(longest+1) + f' {e[1]}' for e in entries]
+        return '\n'.join(entries)
+
+    def _v_load(self, object: str, options: list):
+        """Load gazetteer content from file."""
         format = ''
         if options:
             if len(options) == 1:
@@ -55,6 +70,14 @@ class CLI:
         else:
             format = object.split('.')[-1]
         return self.manager.load(object, format)
+
+    def _v_list(self):
+        """List contents of the gazetteer."""
+        return self._contents()
+
+    def _v_ls(self):
+        """List contents of the gazetteer."""
+        return self._contents()
 
 
         
