@@ -7,6 +7,8 @@ Interactive command-line interface to Oikoumene
 from airtight.cli import configure_commandline
 from oikoumene.cli import CLI
 import logging
+import readline
+
 
 logger = logging.getLogger(__name__)
 
