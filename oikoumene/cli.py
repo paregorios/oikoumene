@@ -93,5 +93,16 @@ class CLI:
         """List contents of the gazetteer."""
         return self._contents()
 
+    def _v_save(self, object: str, options: list):
+        """Save gazetteer content to a file."""
+        format = ''
+        if options:
+            if len(options) == 1:
+                format=options[0]
+            else:
+                raise NotImplementedError(options)
+        else:
+            format = object.split('.')[-1]
+        return self.manager.save(object, format)
 
         

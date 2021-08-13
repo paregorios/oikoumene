@@ -56,6 +56,10 @@ class Test_CLI_Init(TestCase):
 class Test_CLI_Verbs(TestCase):
 
     def setUp(self):
+        path = test_data_path / 'foo.json'
+        path.unlink(missing_ok=True)
+        path = test_data_path / 'foo.txt'
+        path.unlink(missing_ok=True)
         self.cli = CLI()
         path = test_data_path / 'moontown_names.json'
         self.cli._v_load(str(path), ['json'])
@@ -106,3 +110,16 @@ class Test_CLI_Verbs(TestCase):
         cmd = 'len'
         r = self.cli._parse([cmd])
         assert_equal('There are 20 objects in the gazetteer.', r)
+
+    def test_save(self):
+        path = test_data_path / 'foo.json'
+        assert_false(path.exists())
+        cmd = f'save {path}'
+        r = self.cli._parse(cmd.split())
+        assert_true(path.exists())
+        path = test_data_path / 'foo.txt'
+        assert_false(path.exists())
+        cmd = f'save {path}'
+        r = self.cli._parse(cmd.split())
+        assert_true(path.exists())
+

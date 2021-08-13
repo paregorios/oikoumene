@@ -140,3 +140,4 @@ test_template_3.py
 cover
 ~$*.docx
 .vscode
+tests/data/foo.*
