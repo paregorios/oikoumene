@@ -22,7 +22,7 @@ class Manager:
         self._context = None
 
     def _ordered_list(self, objs: dict):
-        entries = [(id, obj.strings()) for id, obj in objs.items()]
+        entries = [(id, obj.label) for id, obj in objs.items()]
         rx = re.compile(r'[,\(\)\s]+')
         entries.sort(key=lambda x: rx.sub('', x[1]).lower())
         self._context = OrderedDict()
@@ -91,6 +91,26 @@ class Manager:
         del f
         self.gaz = Gazetteer(data)
         return f'Read {len(self.gaz.contents)} objects from {path}.'
+
+    def merge(self, context_numbers: list):
+        if self.gaz is None:
+            return 'No gazetteer is loaded.'
+        print(f'context numbers: {context_numbers}')
+        ids = [self._context[n][0] for n in context_numbers]
+        print(f'ids: {ids}')
+        id = self.gaz.merge(ids)
+        obj = self.gaz.contents[id]
+        self._context = None
+        return f'Merged {len(ids)} objects to new object "{str(obj)}":\n{obj.json()}'
+
+    def remove(self, context_number):
+        """Remove a single object from the gazetteer."""
+        if self.gaz is None:
+            return 'No gazetteer is loaded.'
+        id, label = self._context[context_number]
+        self.gaz.remove(id)
+        self._context = None
+        return f'Removed "{label}" object from the gazetteer.'
 
     def save(self, output_path: str, output_format: str='json'):
         """Save a gazetteer to file."""

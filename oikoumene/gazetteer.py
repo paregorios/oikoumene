@@ -152,7 +152,9 @@ class Gazetteer(Serializeable):
             target = getattr(self, f'_merge_{type(obj).__name__.lower()}_to_{target_type.lower()}')(target, obj)
         self.add(target)
         for id in ids:
+            print(f'removing {id}')
             self.remove(id)
+        return target.id
 
     def _merge_geographicname_to_geographicname(self, target, gname):
         if gname.attested and target.attested:

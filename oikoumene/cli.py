@@ -32,7 +32,7 @@ class CLI:
         if verb and not object and len(parts) == 0:
             try:
                 return getattr(self, f'_v_{verb.lower()}')()
-            except TypeError:
+            except TypeError as err:
                 return 'Syntax error:\n' + self._usage(verb)
             except AttributeError:
                 return f'Unknown command "{verb}". Type "help" for list of commands.'
@@ -88,6 +88,9 @@ class CLI:
             'load {filepath} {format=json|txt}'
         ]
 
+    def _usage_remove(self):
+        return ['remove {context number}']
+
     def _usage_save(self):
         return [
             'save {filepath}',
@@ -98,6 +101,14 @@ class CLI:
         """List contents of the gazetteer."""
         return self.manager.contents()
 
+    def _v_del(self, object: str, options: list):
+        """See "remove"."""
+        return self._v_remove(object, options)
+
+    def _v_delete(self, object: str, options: list):
+        """See "remove"."""
+        return self._v_remove(object, options)
+
     def _v_drop(self):
         """Erase contents of the gazetteer from memory."""
         return self.manager.drop()
@@ -107,6 +118,11 @@ class CLI:
         if options:
             raise TypeError(options)
         return self.manager.examine(object)
+
+    def _v_exit(self):
+        """See "quit"."""
+        self._v_quit()
+
 
     def _v_find(self, object: str, options: list):
         """Search the gazetteer for matching character strings."""
@@ -150,12 +166,24 @@ class CLI:
             return str(err)
 
     def _v_list(self):
-        """List contents of the gazetteer."""
+        """See "contents"."""
         return self._v_contents()
 
     def _v_ls(self):
-        """List contents of the gazetteer."""
+        """See "contents"."""
         return self._v_contents()
+
+    def _v_merge(self, object:str, options: list):
+        """Merge two or more items in the gazetteer."""
+        context_numbers = [object]
+        context_numbers.extend(options)
+        return self.manager.merge(context_numbers)
+
+    def _v_remove(self, object: str, options: list):
+        """Delete a single gazetteer object."""
+        if options:
+            raise TypeError(options)
+        return self.manager.remove(object)
 
     def _v_save(self, object: str, options: list):
         """Save gazetteer content to a file."""
@@ -170,7 +198,7 @@ class CLI:
         return self.manager.save(object, format)
 
     def _v_q(self):
-        """Quit interactive interface."""
+        """See "quit"."""
         self._v_quit()
 
     def _v_quit(self):

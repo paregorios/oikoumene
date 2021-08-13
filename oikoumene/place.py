@@ -22,6 +22,7 @@ class Place(Base, Serializeable):
         Serializeable.__init__(self)
         self.names = {}
         self.strings = {}
+        self._label = ''
         self._dict_parser = Dict2StringlikeParser()
         if source is not None:
             self.add(source, encoding=encoding)
@@ -81,6 +82,17 @@ class Place(Base, Serializeable):
         else:
             new_id = obj.make_unique_id(list(self.strings.keys()))
             self.strings[new_id] = obj
+
+    @property
+    def label(self):
+        string_labels = [obj.label for k, obj in self.strings.items()]
+        name_labels = [obj.label for k, obj in self.names.items()]
+        labels = set(string_labels)
+        labels = labels.union(name_labels)
+        labels = list(labels)
+        labels.sort()
+        labels = '/'.join(labels)
+        return labels
 
     def __str__(self):
         msg = []

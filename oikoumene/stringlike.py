@@ -187,7 +187,8 @@ class _CitedString(Base, Serializeable):
         if dirty:
             self._generate_id()
 
-    def strings(self):
+    @property
+    def label(self):
         result = self.attested
         rlist = [n for n in self.romanized if n != self.attested]
         if rlist:
