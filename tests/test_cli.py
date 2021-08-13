@@ -96,3 +96,8 @@ class Test_CLI_Verbs(TestCase):
 2: Moontown Airport
 3: Moontown Road""",
             r)
+
+    def test_json(self):
+        cmd = 'json'
+        r = self.cli._parse([cmd])
+        assert_true('"object_type": "Gazetteer"' in r)

@@ -65,6 +65,10 @@ class CLI:
         entries = [f'{e[0]}:'.rjust(longest+1) + f' {e[1]}' for e in entries]
         return '\n'.join(entries)
 
+    def _v_json(self):
+        """List gazetteer contents in JSON format (see "save" to write to file)."""
+        return self.manager.json()
+
     def _v_load(self, object: str, options: list):
         """Load gazetteer content from file."""
         format = ''
