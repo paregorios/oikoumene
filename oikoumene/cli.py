@@ -50,6 +50,12 @@ class CLI:
         """Erase contents of the gazetteer from memory."""
         return self.manager.drop()
 
+    def _v_find(self, object: str, options: list):
+        """Search the gazetteer for matching character strings."""
+        if options:
+            raise NotImplementedError(options)
+        return self.manager.find(object)
+
     def _v_help(self):
         """List available commands."""
         methods = [k for k in dir(self) if k.startswith('_v_')]
