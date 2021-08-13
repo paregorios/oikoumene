@@ -21,8 +21,12 @@ class CLI:
         while True:
             s = norm(input('> '))
             parts = s.split()
-            result = self._parse(parts)
-            print(result)
+            try:
+                result = self._parse(parts)
+            except NotImplementedError:
+                print('This feature is not yet implemented.')
+            else:
+                print(result)
 
     def _parse(self, parts: list=[], verb: str='', object: str='', options: list=[]):
         if verb and not object and len(parts) == 0:
@@ -32,6 +36,7 @@ class CLI:
                 return 'Syntax error:\n' + self._usage(verb)
             except AttributeError:
                 return f'Unknown command "{verb}". Type "help" for list of commands.'
+                
         elif not verb and not object:
             m = rx_integer.match(parts[0])
             if m:
