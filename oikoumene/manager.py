@@ -22,13 +22,13 @@ class Manager:
         self._context = None
 
     def _ordered_list(self, objs: dict):
-        entries = [(id, obj.label) for id, obj in objs.items()]
+        entries = [(id, obj.label, type(obj).__name__) for id, obj in objs.items()]
         rx = re.compile(r'[,\(\)\s]+')
         entries.sort(key=lambda x: rx.sub('', x[1]).lower())
         self._context = OrderedDict()
         for i, entry in enumerate(entries):
             self._context[str(i+1)] = entry
-        return '\n'.join([f'{k}: {v[1]}' for k, v in self._context.items()])
+        return '\n'.join([f'{k}: {v[1]} [{v[2]}]' for k, v in self._context.items()])
 
     def contents(self):
         if self.gaz is None:
@@ -39,6 +39,8 @@ class Manager:
         """Erase the contents of the current gazetteer from memory."""
         if self.gaz is None:
             return 'No gazetteer is loaded.'
+        if self._context is None:
+            return 'Context has been lost. Execute "contents" or "find" to refresh.'
         g = self.gaz
         self.gaz = None
         self._context = None
@@ -50,7 +52,9 @@ class Manager:
         """Examine a single object in the gazetteer."""
         if self.gaz is None:
             return 'No gazetteer is loaded.'
-        id, label = self._context[context_number]
+        if self._context is None:
+            return 'Context has been lost. Execute "contents" or "find" to refresh.'
+        id, label, type_name = self._context[context_number]
         obj = self.gaz.contents[id]
         return f'{label}\n{obj.json()}'
 
@@ -95,19 +99,31 @@ class Manager:
     def merge(self, context_numbers: list):
         if self.gaz is None:
             return 'No gazetteer is loaded.'
-        print(f'context numbers: {context_numbers}')
+        if self._context is None:
+            return 'Context has been lost. Execute "contents" or "find" to refresh.'
         ids = [self._context[n][0] for n in context_numbers]
-        print(f'ids: {ids}')
         id = self.gaz.merge(ids)
         obj = self.gaz.contents[id]
         self._context = None
         return f'Merged {len(ids)} objects to new object "{str(obj)}":\n{obj.json()}'
 
+    def promote(self, context_numbers: list):
+        if self.gaz is None:
+            return 'No gazetter is loaded.'
+        if self._context is None:
+            return 'Context has been lost. Execute "contents" or "find" to refresh.'
+        ids = [self._context[n][0] for n in context_numbers]
+        self.gaz.make_place(ids)
+        self._context = None
+        return f'Promoted {len(ids)} to Place(s).'        
+
     def remove(self, context_number):
         """Remove a single object from the gazetteer."""
         if self.gaz is None:
             return 'No gazetteer is loaded.'
-        id, label = self._context[context_number]
+        if self._context is None:
+            return 'Context has been lost. Execute "contents" or "find" to refresh.'
+        id, label, type_name = self._context[context_number]
         self.gaz.remove(id)
         self._context = None
         return f'Removed "{label}" object from the gazetteer.'

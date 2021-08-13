@@ -12,6 +12,7 @@ import re
 
 logger = logging.getLogger(__name__)
 rx_integer = re.compile(r'^\d+$')
+rx_integer_range = re.compile(r'^(?P<start>\d+)\s*\-\s*(?P<end>\d+)$')
 class CLI:
 
     def __init__(self):
@@ -33,8 +34,10 @@ class CLI:
             try:
                 return getattr(self, f'_v_{verb.lower()}')()
             except TypeError as err:
+                logger.error(str(err))
                 return 'Syntax error:\n' + self._usage(verb)
-            except AttributeError:
+            except AttributeError as err:
+                logger.error(str(err))
                 return f'Unknown command "{verb}". Type "help" for list of commands.'
         elif not verb and not object:
             m = rx_integer.match(parts[0])
@@ -48,8 +51,10 @@ class CLI:
             try:
                 return getattr(self, f'_v_{verb.lower()}')(object=object, options=options)
             except TypeError as err:
+                logger.error(str(err))
                 return 'Syntax error:\n' + self._usage(verb)
-            except AttributeError:
+            except AttributeError as err:
+                logger.error(str(err))
                 return f'Unknown command "{verb}"". Type "help" for list of commands.'
         elif not verb and object:
             if len(parts) == 0 and len(options) == 0:
@@ -178,6 +183,26 @@ class CLI:
         context_numbers = [object]
         context_numbers.extend(options)
         return self.manager.merge(context_numbers)
+
+    def _v_promote(self, object: str, options: list):
+        """Turn a gazetteer object into a Place."""
+        m = rx_integer_range.match(object)
+        if m is not None:
+            start = int(m.group('start'))
+            end = int(m.group('end'))
+            context_numbers = list(range(start, end + 1))
+            context_numbers = [str(n) for n in context_numbers]
+        else:
+            m = rx_integer.match(object)
+            if m is not None:
+                context_numbers = [object]
+        context_numbers = set(context_numbers)
+        for opt in options:
+            m = rx_integer.match(opt)
+            if m is not None:
+                context_numbers.add(opt)
+        context_numbers = list(context_numbers)
+        return self.manager.promote(context_numbers)
 
     def _v_remove(self, object: str, options: list):
         """Delete a single gazetteer object."""
