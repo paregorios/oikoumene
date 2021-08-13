@@ -36,26 +36,28 @@ class CLI:
                 return 'Syntax error:\n' + self._usage(verb)
             except AttributeError:
                 return f'Unknown command "{verb}". Type "help" for list of commands.'
-                
         elif not verb and not object:
             m = rx_integer.match(parts[0])
             if m:
-                raise NotImplementedError()
+                return self._parse(parts[1:], object=parts[0])
             else:
                 return self._parse(parts[1:], verb=parts[0])
         elif verb and not object:
-            m = rx_integer.match(parts[-1])
-            if m:
-                raise NotImplementedError()
-            else:
-                return self._parse(verb=verb, object=parts[-1], options=parts[:-1])
+            return self._parse(verb=verb, object=parts[-1], options=parts[:-1])
         elif verb and object:
             try:
                 return getattr(self, f'_v_{verb.lower()}')(object=object, options=options)
-            except TypeError:
+            except TypeError as err:
                 return 'Syntax error:\n' + self._usage(verb)
             except AttributeError:
                 return f'Unknown command "{verb}"". Type "help" for list of commands.'
+        elif not verb and object:
+            if len(parts) == 0 and len(options) == 0:
+                return self._parse(verb='examine', object=object)
+            else:
+                raise RuntimeError('barf')
+        else:
+            raise RuntimeError('panic')
 
     def _usage(self, verb: str):
         v = verb.lower()
@@ -71,6 +73,9 @@ class CLI:
             usage = ''
         msg = f'{v}: {doc}' + usage
         return msg.strip()
+
+    def _usage_examine(self):
+        return ['examine {context number}']
 
     def _usage_find(self):
         return [
@@ -96,6 +101,12 @@ class CLI:
     def _v_drop(self):
         """Erase contents of the gazetteer from memory."""
         return self.manager.drop()
+    
+    def _v_examine(self, object: str, options: list):
+        """Examine a single gazetteer object from the most recent "contents" listing."""
+        if options:
+            raise TypeError(options)
+        return self.manager.examine(object)
 
     def _v_find(self, object: str, options: list):
         """Search the gazetteer for matching character strings."""

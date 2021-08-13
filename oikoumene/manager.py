@@ -27,8 +27,8 @@ class Manager:
         entries.sort(key=lambda x: rx.sub('', x[1]).lower())
         self._context = OrderedDict()
         for i, entry in enumerate(entries):
-            self._context[str(i+1)] = entry[1]
-        return '\n'.join([f'{k}: {v}' for k, v in self._context.items()])
+            self._context[str(i+1)] = entry
+        return '\n'.join([f'{k}: {v[1]}' for k, v in self._context.items()])
 
     def contents(self):
         if self.gaz is None:
@@ -45,6 +45,14 @@ class Manager:
         count = len(g.contents)
         del g
         return f'Erased current gazetteer from memory ({count} objects).'
+
+    def examine(self, context_number):
+        """Examine a single object in the gazetteer."""
+        if self.gaz is None:
+            return 'No gazetteer is loaded.'
+        id, label = self._context[context_number]
+        obj = self.gaz.contents[id]
+        return f'{label}\n{obj.json()}'
 
     def find(self, search_string: str):
         if self.gaz is None:
