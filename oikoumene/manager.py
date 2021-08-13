@@ -28,7 +28,7 @@ class Manager:
         self._context = OrderedDict()
         for i, entry in enumerate(entries):
             self._context[str(i+1)] = entry[1]
-        return [f'{k}: {v}' for k, v in self._context.items()]
+        return '\n'.join([f'{k}: {v}' for k, v in self._context.items()])
 
     def contents(self):
         return self._ordered_list(self.gaz.contents)
