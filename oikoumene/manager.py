@@ -52,7 +52,7 @@ class Manager:
 
     def len(self):
         """Get number of objects in the gazetteer."""
-        return len(self.gaz.contents)
+        return f'There are {len(self.gaz.contents)} objects in the gazetteer.'
 
     def load(self, input_path: str, input_format: str='json'):
         """Load a gazetteer from file."""

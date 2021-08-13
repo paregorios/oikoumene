@@ -101,3 +101,8 @@ class Test_CLI_Verbs(TestCase):
         cmd = 'json'
         r = self.cli._parse([cmd])
         assert_true('"object_type": "Gazetteer"' in r)
+
+    def test_len(self):
+        cmd = 'len'
+        r = self.cli._parse([cmd])
+        assert_equal('There are 20 objects in the gazetteer.', r)

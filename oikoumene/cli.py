@@ -69,6 +69,10 @@ class CLI:
         """List gazetteer contents in JSON format (see "save" to write to file)."""
         return self.manager.json()
 
+    def _v_len(self):
+        """Count number of objects in the gazetteer."""
+        return self.manager.len()
+
     def _v_load(self, object: str, options: list):
         """Load gazetteer content from file."""
         format = ''
