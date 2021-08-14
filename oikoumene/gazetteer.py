@@ -152,16 +152,14 @@ class Gazetteer(Serializeable):
             target = getattr(self, f'_merge_{type(obj).__name__.lower()}_to_{target_type.lower()}')(target, obj)
         self.add(target)
         for id in ids:
-            print(f'removing {id}')
             self.remove(id)
         return target.id
 
     def _merge_geographicname_to_geographicname(self, target, gname):
         if gname.attested and target.attested:
             if gname.attested != target.attested:
-                raise RuntimeError(
-                    f'Cannot merge GeographicNames with differing attested forms '
-                    f'({target.attested} vs. {gname.attested}')
+                # can't combine so make a place to hold both
+                return self._merge_to_place([target, gname])
         elif target.attested and not gname.attested:
             pass
         elif not target.attested and gname.attested:
@@ -170,6 +168,12 @@ class Gazetteer(Serializeable):
             raise RuntimeError("?")
         for rname in gname.romanized:
             target.romanized = rname
+        return target
+
+    def _merge_to_place(self, objects: list):
+        target = Place()
+        for obj in objects:
+            target = getattr(self, f'_merge_{type(obj).__name__.lower()}_to_place')(target, obj)
         return target
 
     def _merge_geographicname_to_place(self, target, gname):
