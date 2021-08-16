@@ -39,8 +39,6 @@ class Manager:
         """Erase the contents of the current gazetteer from memory."""
         if self.gaz is None:
             return 'No gazetteer is loaded.'
-        if self._context is None:
-            return 'Context has been lost. Execute "contents" or "find" to refresh.'
         g = self.gaz
         self.gaz = None
         self._context = None
