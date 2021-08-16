@@ -95,6 +95,20 @@ class Test_CLI_Verbs(TestCase):
 20: The Saddle [GeographicName]""",
             r)
 
+    def test_examine(self):
+        cmd = 'ls'
+        self.cli._parse(cmd.split())
+        cmd = 'examine'
+        r = self.cli._parse(cmd.split())
+        assert_true(r.startswith('Syntax error'))
+        cmd = 'examine 1'
+        r = self.cli._parse(cmd.split())
+        assert_true(
+            r.startswith('3 M5\n{'))
+        cmd = 'examine 1 noodle'
+        r = self.cli._parse(cmd.split())
+        assert_true(r.startswith('Syntax error'))
+        
     def test_examine_numeric(self):
         cmd = 'ls'
         self.cli._parse(cmd.split())
