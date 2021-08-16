@@ -131,6 +131,11 @@ class Test_CLI_Verbs(TestCase):
         assert_equal(
             'Unknown command "banana". Type "help" for list of commands.',
             r)
+        cmd = 'banana jr.'
+        r = self.cli._parse(cmd.split())
+        assert_equal(
+            'Unknown command "banana". Type "help" for list of commands.',
+            r)
 
     def test_parse_extraneous_object(self):
         cmd = 'drop basket'
