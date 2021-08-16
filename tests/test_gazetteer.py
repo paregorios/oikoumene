@@ -200,6 +200,7 @@ class Test_Gazetteer(TestCase):
         assert_equal(1, len(entries))
         for id, obj in entries.items():
             assert_true(isinstance(obj, Place))
+            print(obj.json())
 
     def test_make_place(self):
         path = Path('data/examples/moontown_names.json').resolve()
@@ -216,7 +217,7 @@ class Test_Gazetteer(TestCase):
         assert_equal(16, len(gaz.contents))
         for id, obj in gaz.contents.items():
             assert_true(isinstance(obj, Place))
-        assert_equal(19, len(gaz._indexes['_all_text'].values))
+        assert_equal(20, len(gaz._indexes['_all_text'].values))
         
         
 
