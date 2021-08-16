@@ -113,7 +113,10 @@ class Gazetteer(Serializeable):
         for id in real_ids:
             target = Place()
             obj = self.contents[id]
-            target = getattr(self, f'_merge_{type(obj).__name__.lower()}_to_place')(target, obj)
+            try:
+                target = getattr(self, f'_merge_{type(obj).__name__.lower()}_to_place')(target, obj)
+            except AttributeError:
+                raise NotImplementedError(f'Merge {type(obj).__name__} to place')
             self.add(target)
             self.remove(id)
 
@@ -149,7 +152,10 @@ class Gazetteer(Serializeable):
             else:
                 raise
         for obj in objs:
-            target = getattr(self, f'_merge_{type(obj).__name__.lower()}_to_{target_type.lower()}')(target, obj)
+            try:
+                target = getattr(self, f'_merge_{type(obj).__name__.lower()}_to_{target_type.lower()}')(target, obj)
+            except AttributeError:
+                raise NotImplementedError(f'Merge {type(obj).__name__} to {target_type}')
         self.add(target)
         for id in ids:
             self.remove(id)
