@@ -95,6 +95,14 @@ class Test_CLI_Verbs(TestCase):
 20: The Saddle [GeographicName]""",
             r)
 
+    def test_examine_numeric(self):
+        cmd = 'ls'
+        self.cli._parse(cmd.split())
+        cmd = '1'
+        r = self.cli._parse(cmd.split())
+        assert_true(
+            r.startswith('3 M5\n{'))
+
     def test_find(self):
         cmd = 'find moontown'
         r = self.cli._parse(cmd.split())
