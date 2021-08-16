@@ -125,3 +125,33 @@ class Test_CLI_Verbs(TestCase):
         r = self.cli._parse(cmd.split())
         assert_true(path.exists())
 
+    def test_parse_unknown_verb(self):
+        cmd = 'banana'
+        r = self.cli._parse(cmd.split())
+        assert_equal(
+            'Unknown command "banana". Type "help" for list of commands.',
+            r)
+
+    def test_parse_extraneous_object(self):
+        cmd = 'drop basket'
+        r = self.cli._parse(cmd.split())
+        assert_true(r.startswith('Syntax error'))
+
+    def test_parse_missing_object(self):
+        cmd = 'remove'
+        r = self.cli._parse(cmd.split())
+        assert_true(r.startswith('Syntax error'))
+
+    def test_parse_lost_context(self):
+        cmd = 'remove 999'
+        r = self.cli._parse(cmd.split())
+        assert_equal(
+            'Context has been lost. Execute "contents" or "find" to refresh.',
+            r)
+
+    def test_parse_invalid_context(self):
+        cmd = 'ls'
+        r = self.cli._parse(cmd.split())
+        cmd = 'remove 999'
+        r = self.cli._parse(cmd.split())
+        print(r)
