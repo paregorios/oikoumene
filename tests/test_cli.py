@@ -8,6 +8,8 @@ from oikoumene.cli import CLI
 from pathlib import Path
 from unittest import TestCase
 
+TestCase.maxDiff = None
+
 logger = logging.getLogger(__name__)
 test_data_path = Path('tests/data').resolve()
 
@@ -71,34 +73,34 @@ class Test_CLI_Verbs(TestCase):
     def test_contents(self):
         cmd = 'contents'
         r = self.cli._parse([cmd,])
-        assert_equal("""1: 3 M5
-2: Berry Road
-3: Berry Road
-4: Bob Hunt Road
-5: Cedar Mountain
-6: Chestnut Knob
-7: Flint River
-8: Hambrick Branch
-9: Landing Strip
-10: Lickskillet
-11: Madison County Sky Park
-12: Minnow Creek
-13: Moontown
-14: Moontown Airport
-15: Moontown Road
-16: North Alabama Canoe and Kayak
-17: Sublett Bluff
-18: Sublett Cemetery
-19: The Mountain
-20: The Saddle""",
+        assert_equal("""1: 3 M5 [GeographicName]
+2: Berry Road [GeographicName]
+3: Berry Road [GeographicName]
+4: Bob Hunt Road [GeographicName]
+5: Cedar Mountain [GeographicName]
+6: Chestnut Knob [GeographicName]
+7: Flint River [GeographicName]
+8: Hambrick Branch [GeographicName]
+9: Landing Strip [GeographicString]
+10: Lickskillet [GeographicName]
+11: Madison County Sky Park [GeographicName]
+12: Minnow Creek [GeographicName]
+13: Moontown [GeographicName]
+14: Moontown Airport [GeographicName]
+15: Moontown Road [GeographicName]
+16: North Alabama Canoe and Kayak [GeographicName]
+17: Sublett Bluff [GeographicName]
+18: Sublett Cemetery [GeographicName]
+19: The Mountain [GeographicName]
+20: The Saddle [GeographicName]""",
             r)
 
     def test_find(self):
         cmd = 'find moontown'
         r = self.cli._parse(cmd.split())
-        assert_equal("""1: Moontown
-2: Moontown Airport
-3: Moontown Road""",
+        assert_equal("""1: Moontown [GeographicName]
+2: Moontown Airport [GeographicName]
+3: Moontown Road [GeographicName]""",
             r)
 
     def test_json(self):
