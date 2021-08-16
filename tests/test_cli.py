@@ -108,7 +108,7 @@ class Test_CLI_Verbs(TestCase):
         cmd = 'examine 1 noodle'
         r = self.cli._parse(cmd.split())
         assert_true(r.startswith('Syntax error'))
-        
+
     def test_examine_numeric(self):
         cmd = 'ls'
         self.cli._parse(cmd.split())
@@ -139,7 +139,7 @@ class Test_CLI_Verbs(TestCase):
         cmd = 'len'
         r = self.cli._parse([cmd])
         assert_equal('There are 20 objects in the gazetteer.', r)
-
+        
     def test_save(self):
         path = test_data_path / 'foo.json'
         assert_false(path.exists())
@@ -189,3 +189,44 @@ class Test_CLI_Verbs(TestCase):
         assert_equal(
             'Context number out of range (999). Valid numbers are currently from 1 to 20.',
             r)
+
+class Test_CLI_Destructive(TestCase):
+
+    def setUp(self):
+        path = test_data_path / 'foo.json'
+        path.unlink(missing_ok=True)
+        path = test_data_path / 'foo.txt'
+        path.unlink(missing_ok=True)
+        self.cli = CLI()
+        path = test_data_path / 'moontown_names.json'
+        self.cli._v_load(str(path), ['json'])
+
+    def test_remove(self):
+        cmd = 'ls'
+        self.cli._parse(cmd.split())
+        cmd = 'remove'
+        r = self.cli._parse(cmd.split())
+        assert_true(r.startswith('Syntax error'))
+        cmd = 'remove 1'
+        r = self.cli._parse(cmd.split())
+        assert_equal('Removed "3 M5" object from the gazetteer.', r)
+        cmd = 'remove 1 fish'
+        r = self.cli._parse(cmd.split())
+        assert_true(r.startswith('Syntax error'))
+        cmd = 'ls'
+        self.cli._parse(cmd.split())
+        cmd = 'del 1'
+        r = self.cli._parse(cmd.split())
+        assert_equal('Removed "Berry Road" object from the gazetteer.', r)
+        cmd = 'ls'
+        self.cli._parse(cmd.split())
+        cmd = 'delete 1'
+        r = self.cli._parse(cmd.split())
+        assert_equal('Removed "Berry Road" object from the gazetteer.', r)
+
+    def test_merge(self):
+        cmd = 'find airport sky'
+        self.cli._parse(cmd.split())
+        cmd = 'merge 1 2'
+        r = self.cli._parse(cmd.split())
+        assert_true(r.startswith('Merged 2 objects to new object'))

@@ -132,8 +132,11 @@ class CLI:
     def _v_find(self, object: str, options: list):
         """Search the gazetteer for matching character strings."""
         if options:
-            raise NotImplementedError(options)
-        return self.manager.find(object)
+            targets = [object,]
+            targets.extend(options)
+            return self.manager.find(targets)
+        else:
+            return self.manager.find(object)
 
     def _v_help(self, object: str='', options: list=[]):
         """List available commands."""

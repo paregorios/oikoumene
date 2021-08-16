@@ -59,10 +59,10 @@ class Manager:
         obj = self.gaz.contents[id]
         return f'{label}\n{obj.json()}'
 
-    def find(self, search_string: str):
+    def find(self, targets):
         if self.gaz is None:
             return 'No gazetteer is loaded.'
-        entries = self.gaz.get({'text': search_string}, operator='or')
+        entries = self.gaz.get({'text': targets}, operator='or')
         return self._ordered_list(entries)
 
     def json(self):
