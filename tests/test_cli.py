@@ -154,4 +154,6 @@ class Test_CLI_Verbs(TestCase):
         r = self.cli._parse(cmd.split())
         cmd = 'remove 999'
         r = self.cli._parse(cmd.split())
-        print(r)
+        assert_equal(
+            'Context number out of range (999). Valid numbers are currently from 1 to 20.',
+            r)

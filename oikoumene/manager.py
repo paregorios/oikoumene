@@ -52,7 +52,10 @@ class Manager:
             return 'No gazetteer is loaded.'
         if self._context is None:
             return 'Context has been lost. Execute "contents" or "find" to refresh.'
-        id, label, type_name = self._context[context_number]
+        try:
+            id, label, type_name = self._context[context_number]
+        except KeyError:
+            return self._context_oor(context_number)
         obj = self.gaz.contents[id]
         return f'{label}\n{obj.json()}'
 
@@ -99,7 +102,10 @@ class Manager:
             return 'No gazetteer is loaded.'
         if self._context is None:
             return 'Context has been lost. Execute "contents" or "find" to refresh.'
-        ids = [self._context[n][0] for n in context_numbers]
+        try:
+            ids = [self._context[n][0] for n in context_numbers]
+        except KeyError:
+            return self._context_oor(context_numbers)
         id = self.gaz.merge(ids)
         obj = self.gaz.contents[id]
         self._context = None
@@ -110,7 +116,10 @@ class Manager:
             return 'No gazetter is loaded.'
         if self._context is None:
             return 'Context has been lost. Execute "contents" or "find" to refresh.'
-        ids = [self._context[n][0] for n in context_numbers]
+        try:
+            ids = [self._context[n][0] for n in context_numbers]
+        except KeyError:
+            return self._context_oor(context_numbers)
         self.gaz.make_place(ids)
         self._context = None
         return f'Promoted {len(ids)} to Place(s).'        
@@ -121,7 +130,10 @@ class Manager:
             return 'No gazetteer is loaded.'
         if self._context is None:
             return 'Context has been lost. Execute "contents" or "find" to refresh.'
-        id, label, type_name = self._context[context_number]
+        try:
+            id, label, type_name = self._context[context_number]
+        except KeyError:
+            return self._context_oor(context_number)
         self.gaz.remove(id)
         self._context = None
         return f'Removed "{label}" object from the gazetteer.'
@@ -147,5 +159,17 @@ class Manager:
         if self.gaz is None:
             return 'No gazetteer is loaded.'
         return str(self.gaz)
+
+    def _context_oor(self, context_numbers):
+        """Write error for context out of range"""
+        nums = sorted([int(n) for n in list(self._context.keys())])
+        if isinstance(context_numbers, str):
+            bad = context_numbers
+        elif isinstance(context_numbers, list):
+            bad = [n for n in context_numbers if int(n) not in nums]
+            bad = ', '.join(bad)
+        return (
+            f'Context number out of range ({bad}). '
+            f'Valid numbers are currently from {nums[0]} to {nums[-1]}.')
 
 
