@@ -129,7 +129,6 @@ class Test_CitedString(TestCase):
             attested='Moontown')
         j = n.json()
         d = json.loads(j)
-        pprint(d, indent=4)
         assert_equal(6, len(d))
         assert_equal(
             ['attested', 'id', 'label', 'object_type', 'prior_ids', 'romanized'],

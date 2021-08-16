@@ -200,7 +200,6 @@ class Test_Gazetteer(TestCase):
         assert_equal(1, len(entries))
         for id, obj in entries.items():
             assert_true(isinstance(obj, Place))
-            print(obj.json())
 
     def test_make_place(self):
         path = Path('data/examples/moontown_names.json').resolve()
