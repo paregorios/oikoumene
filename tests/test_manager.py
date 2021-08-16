@@ -54,7 +54,7 @@ class Test_Manager(TestCase):
         m = Manager()
         path = test_data_path / 'moontown_names.json'
         r = m.load(path, 'json')
-        assert_equal(20, m.len())
+        assert_equal('There are 20 objects in the gazetteer.', m.len())
 
     def test_str(self):
         m = Manager()
