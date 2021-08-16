@@ -5,6 +5,7 @@ Gazetteer
 """
 
 from copy import deepcopy
+from inspect import getmembers
 import logging
 from oikoumene.indexing import StringIndex
 from oikoumene.parsing import *
@@ -12,8 +13,7 @@ from oikoumene.place import Dict2PlaceParser, Place
 from oikoumene.serialization import Serializeable
 from oikoumene.stringlike import Dict2StringlikeParser, GeographicName, GeographicString
 from typing import Union, Sequence
-from types import FunctionType
-from inspect import getmembers
+from types import FunctionType, MethodType
 
 logger = logging.getLogger(__name__)
 
@@ -188,6 +188,17 @@ class Gazetteer(Serializeable):
 
     def _merge_geographicstring_to_place(self, target, gstring):
         target.add(gstring)
+        return target
+
+    def _merge_place_to_place(self, target, source):
+        field_names = [n for n in dir(source) if not n.startswith('_') and n not in ['id', 'label'] and not isinstance(getattr(source, n), (MethodType))]
+        for field_name in field_names:
+            field = getattr(source, field_name)
+            if isinstance(field, dict):
+                for vid, v in field.items():
+                    target = getattr(self, f'_merge_{type(v).__name__.lower()}_to_place')(target, v)
+            else:
+                raise NotImplementedError(type(field))
         return target
 
     def reindex(self, ids: list):

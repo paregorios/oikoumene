@@ -230,3 +230,23 @@ class Test_CLI_Destructive(TestCase):
         cmd = 'merge 1 2'
         r = self.cli._parse(cmd.split())
         assert_true(r.startswith('Merged 2 objects to new object'))
+
+    def test_promote(self):
+        cmd = 'find hambrick'
+        self.cli._parse(cmd.split())
+        cmd = 'promote 1'
+        r = self.cli._parse(cmd.split())
+        assert_equal('Promoted 1 to Place(s).', r)
+        cmd = 'ls'
+        self.cli._parse(cmd.split())
+        cmd = 'promote 1 2 4'
+        r = self.cli._parse(cmd.split())
+        assert_equal('Promoted 3 to Place(s).', r)
+        cmd = 'ls'
+        self.cli._parse(cmd.split())
+        cmd = 'promote 1-10'
+        r = self.cli._parse(cmd.split())
+        assert_equal('Promoted 10 to Place(s).', r)
+        cmd = 'ls'
+        r = self.cli._parse(cmd.split())
+        print(r)

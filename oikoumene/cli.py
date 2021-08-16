@@ -55,7 +55,6 @@ class CLI:
                 return 'Syntax error:\n' + self._usage(verb)
             except AttributeError as err:
                 logger.error(str(err))
-                raise
                 return f'Unknown command "{verb}". Type "help" for list of commands.'
         elif not verb and object:
             if len(parts) == 0 and len(options) == 0:
