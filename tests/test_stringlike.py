@@ -129,13 +129,15 @@ class Test_CitedString(TestCase):
             attested='Moontown')
         j = n.json()
         d = json.loads(j)
-        assert_equal(5, len(d))
+        pprint(d, indent=4)
+        assert_equal(6, len(d))
         assert_equal(
-            ['attested', 'id', 'object_type', 'prior_ids', 'romanized'],
+            ['attested', 'id', 'label', 'object_type', 'prior_ids', 'romanized'],
             sorted(list(d.keys())))
         expected = {
             'attested': 'Moontown',
             'id': 'moontown',
+            'label': 'Moontown',
             'object_type': '_CitedString',
             'romanized': ['Moontown']}
         for k, v in expected.items():
