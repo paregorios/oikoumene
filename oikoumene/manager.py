@@ -111,6 +111,31 @@ class Manager:
         self._context = None
         return f'Merged {len(ids)} objects to new object "{str(obj)}":\n{obj.json()}'
 
+    def new(self, type_name: str, data: list):
+        if isinstance(data, dict):
+            data_dict = data
+        elif isinstance(data, list):
+            data_dict = self._new_parse_data_list(data)
+        else:
+            raise TypeError(type(data))
+        try:
+            obj = getattr(self.gaz, f'new_{type_name.lower()}')(data_dict)
+        except AttributeError as err:
+            raise NotImplementedError(f'new {type_name}')
+        else:
+            return f'Created {type(obj).__name__} with id={obj.id}'
+
+    def _new_parse_data_list(self, data: list):
+        if len(data) == 0:
+            return {}
+        if len(data) == 1 and ':' not in data[0]:
+            return {'name': data[0]}
+        d = {}
+        for element in data:
+            k, v = element.split(':')
+            d[k] = v
+        return d
+
     def promote(self, context_numbers: list):
         if self.gaz is None:
             return 'No gazetter is loaded.'

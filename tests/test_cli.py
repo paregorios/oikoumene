@@ -6,6 +6,7 @@ import logging
 from nose.tools import assert_equal, assert_false, assert_true, raises
 from oikoumene.cli import CLI
 from pathlib import Path
+import shlex
 from unittest import TestCase
 
 TestCase.maxDiff = None
@@ -201,6 +202,21 @@ class Test_CLI_Destructive(TestCase):
         path = test_data_path / 'moontown_names.json'
         self.cli._v_load(str(path), ['json'])
 
+    def test_new_place(self):
+        cmd = "new place"
+        r = self.cli._parse(cmd.split())
+        assert_true(r.startswith('Created Place with id='))
+
+    def test_new_name(self):
+        cmd = "new name attested:Moontown"
+        r = self.cli._parse(cmd.split())
+        assert_true(r.startswith('Created GeographicName with id='))
+
+    def test_new_string(self):
+        cmd = "new string romanized:'Landing Strip'"
+        r = self.cli._parse(shlex.split(cmd))
+        assert_true(r.startswith('Created GeographicString with id='))
+
     def test_remove(self):
         cmd = 'ls'
         self.cli._parse(cmd.split())
@@ -249,4 +265,24 @@ class Test_CLI_Destructive(TestCase):
         assert_equal('Promoted 10 to Place(s).', r)
         cmd = 'ls'
         r = self.cli._parse(cmd.split())
-        print(r)
+        assert_equal("""1: 3 M5 [Place]
+2: Berry Road [Place]
+3: Berry Road [Place]
+4: Bob Hunt Road [Place]
+5: Cedar Mountain [Place]
+6: Chestnut Knob [Place]
+7: Flint River [Place]
+8: Hambrick Branch [Place]
+9: Landing Strip [Place]
+10: Lickskillet [Place]
+11: Madison County Sky Park [GeographicName]
+12: Minnow Creek [GeographicName]
+13: Moontown [GeographicName]
+14: Moontown Airport [GeographicName]
+15: Moontown Road [GeographicName]
+16: North Alabama Canoe and Kayak [GeographicName]
+17: Sublett Bluff [GeographicName]
+18: Sublett Cemetery [GeographicName]
+19: The Mountain [GeographicName]
+20: The Saddle [GeographicName]""",
+            r)

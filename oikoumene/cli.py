@@ -9,6 +9,7 @@ import logging
 from oikoumene.normalization import norm
 from oikoumene.manager import Manager
 import re
+import shlex
 
 logger = logging.getLogger(__name__)
 rx_integer = re.compile(r'^\d+$')
@@ -21,7 +22,7 @@ class CLI:
     def interact(self):
         while True:
             s = norm(input('> '))
-            parts = s.split()
+            parts = shlex.split(s)
             try:
                 result = self._parse(parts)
             except NotImplementedError as err:
@@ -46,7 +47,7 @@ class CLI:
             else:
                 return self._parse(parts[1:], verb=parts[0])
         elif verb and not object:
-            return self._parse(verb=verb, object=parts[-1], options=parts[:-1])
+            return self._parse(verb=verb, object=parts[0], options=parts[1:])
         elif verb and object:
             try:
                 return getattr(self, f'_v_{verb.lower()}')(object=object, options=options)
@@ -186,6 +187,10 @@ class CLI:
         context_numbers = [object]
         context_numbers.extend(options)
         return self.manager.merge(context_numbers)
+
+    def _v_new(self, object: str, options: list=[]):
+        """Create a new object in the gazetteer."""
+        return self.manager.new(type_name=object, data=options)
 
     def _v_promote(self, object: str, options: list):
         """Turn a gazetteer object into a Place."""

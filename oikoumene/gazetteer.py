@@ -201,6 +201,27 @@ class Gazetteer(Serializeable):
                 raise NotImplementedError(type(field))
         return target
 
+    def new_name(self, data: dict):
+        if not isinstance(data, dict):
+            raise TypeError(type(data))
+        n = self._dict_parser.parse_dict(data, 'GeographicName')
+        self.add(n)
+        return n
+
+    def new_place(self, data: dict):
+        if not isinstance(data, dict):
+            raise TypeError(type(data))
+        p = self._place_parser.parse_dict(data)
+        self.add(p)
+        return p
+
+    def new_string(self, data: dict):
+        if not isinstance(data, dict):
+            raise TypeError(type(data))
+        n = self._dict_parser.parse_dict(data, 'GeographicString')
+        self.add(n)
+        return n
+
     def reindex(self, ids: list):
         if isinstance(ids, list):
             real_ids = ids
