@@ -9,6 +9,8 @@ from oikoumene.manager import Manager
 from pathlib import Path
 from unittest import TestCase
 
+TestCase.maxDiff = None
+
 logger = logging.getLogger(__name__)
 test_data_path = Path('tests/data').resolve()
 
@@ -80,8 +82,8 @@ GeographicString: Moontown Airport""",
         path = test_data_path / 'strings.txt'
         m.load(path, 'txt')
         r = m.find('Moontown')
-        assert_equal(
-            ['1: Moontown', '2: Moontown Airport'],
+        assert_equal("""1: Moontown [GeographicString]
+2: Moontown Airport [GeographicString]""",
             r)
 
     def test_contents(self):
@@ -89,6 +91,9 @@ GeographicString: Moontown Airport""",
         path = test_data_path / 'strings.txt'
         m.load(path, 'txt')
         r = m.contents()
-        assert_equal(
-            ['1: Cedar Mountain', '2: Chestnut Knob', '3: Hambrick Branch', '4: Moontown', '5: Moontown Airport'],
+        assert_equal("""1: Cedar Mountain [GeographicString]
+2: Chestnut Knob [GeographicString]
+3: Hambrick Branch [GeographicString]
+4: Moontown [GeographicString]
+5: Moontown Airport [GeographicString]""",
             r)
