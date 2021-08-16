@@ -102,6 +102,11 @@ class Test_CLI_Verbs(TestCase):
         r = self.cli._parse(cmd.split())
         assert_true(
             r.startswith('3 M5\n{'))
+        cmd = '999'
+        r = self.cli._parse(cmd.split())
+        assert_equal(
+            'Context number out of range (999). Valid numbers are currently from 1 to 20.',
+            r)
 
     def test_find(self):
         cmd = 'find moontown'
