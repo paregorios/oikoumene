@@ -7,6 +7,7 @@ manager
 from collections import OrderedDict
 import json
 import logging
+from oikoumene.alignment import SelfAligner
 from oikoumene.gazetteer import Gazetteer
 from oikoumene.parsing import StringParser
 
@@ -20,15 +21,52 @@ class Manager:
     def __init__(self):
         self.gaz = None
         self._context = None
+        self._alignments = None
+        self._reviewed = []
 
-    def _ordered_list(self, objs: dict):
+    def _ordered_list(self, objs: dict, include_id=False, prefix=''):
         entries = [(id, obj.label, type(obj).__name__) for id, obj in objs.items()]
         rx = re.compile(r'[,\(\)\s]+')
         entries.sort(key=lambda x: rx.sub('', x[1]).lower())
         self._context = OrderedDict()
         for i, entry in enumerate(entries):
             self._context[str(i+1)] = entry
-        return '\n'.join([f'{k}: {v[1]} [{v[2]}]' for k, v in self._context.items()])
+        if include_id:
+            return '\n'.join([f'{prefix}{k}: {v[1]} [{v[2]}] (id={v[0]})' for k, v in self._context.items()])
+        else:
+            return '\n'.join([f'{prefix}{k}: {v[1]} [{v[2]}]' for k, v in self._context.items()])
+
+    def align_self(self):
+        sa = SelfAligner(self.gaz, text={})
+        results = {}
+        candidates = []
+        prior_match_batches = set()
+        for id, obj in self.gaz.contents.items():
+            candidate = (id, obj.label, type(obj).__name__)
+            matches = sa.align_object(obj)
+            if matches:
+                match_batch = [*matches, id]
+                match_batch.sort()
+                match_batch = '-'.join(match_batch)
+                if match_batch not in prior_match_batches:
+                    results[id] = matches
+                    candidates.append(candidate)
+                    prior_match_batches.add(match_batch)
+        rx = re.compile(r'[,\(\)\s]+')
+        candidates.sort(key=lambda x: rx.sub('', x[1]).lower())
+        self._alignments = OrderedDict()
+        for i, candidate in enumerate(candidates):
+            matches = {id: self.gaz.contents[id] for id in results[candidate[0]]}
+            self._alignments[str(i+1)] = (*candidate, matches)
+        qty = len(candidates)
+        if qty == 1:
+            msg = f'{qty} object in the gazetteer has '
+        else:
+            msg = f'{qty} objects in the gazetteer have '
+        msg += 'possible matches with other objects.'
+        if qty > 0:
+            msg += ' Use "review matches" to merge matches selectively.'
+        return msg
 
     def contents(self):
         if self.gaz is None:
@@ -162,6 +200,18 @@ class Manager:
         self.gaz.remove(id)
         self._context = None
         return f'Removed "{label}" object from the gazetteer.'
+
+    def review_matches(self):
+        for anum, alignment in self._alignments.items():
+            if anum not in self._reviewed:
+                msg = (
+                    f'Alignment candidate {anum} of {len(self._alignments)}:\n'
+                    f'\t0: {alignment[1]} [{alignment[2]}] (id={alignment[0]})\n'
+                    f'Possible matches:\n')
+                msg += self._ordered_list(alignment[3], include_id=True, prefix='\t')
+                self._context['0'] = (alignment[0], alignment[1], alignment[2])
+                self._reviewed.append(anum)
+                return msg
 
     def save(self, output_path: str, output_format: str='json'):
         """Save a gazetteer to file."""

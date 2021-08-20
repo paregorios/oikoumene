@@ -103,6 +103,13 @@ class CLI:
             'save {filepath} {format=json|txt}'
         ]
 
+    def _v_align(self, object: str, options: list):
+        """Align objects within the gazetteer."""
+        if object == 'self':
+            return self.manager.align_self()
+        else:
+            raise NotImplementedError(object)
+
     def _v_contents(self):
         """List contents of the gazetteer."""
         return self.manager.contents()
@@ -217,6 +224,12 @@ class CLI:
         if options:
             raise TypeError(options)
         return self.manager.remove(object)
+
+    def _v_review(self, object:str, options: list):
+        """Review alignment matches for possible action."""
+        if options:
+            raise TypeError(options)
+        return getattr(self.manager, f'review_{object}')()
 
     def _v_save(self, object: str, options: list):
         """Save gazetteer content to a file."""

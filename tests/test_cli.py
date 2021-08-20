@@ -286,3 +286,15 @@ class Test_CLI_Destructive(TestCase):
 19: The Mountain [GeographicName]
 20: The Saddle [GeographicName]""",
             r)
+
+class Test_CLI_Alignment(TestCase):
+
+    def setUp(self):
+        self.cli = CLI()
+        path = test_data_path / 'moontown_names.json'
+        self.cli._v_load(str(path), ['json'])
+
+    def test_doublet(self):
+        cmd = 'align self'
+        r = self.cli._parse(cmd.split())
+        print(r)
