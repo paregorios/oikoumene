@@ -4,6 +4,7 @@
 Indexing
 """
 
+from fuzzywuzzy import process
 from itertools import combinations
 import logging
 from oikoumene.normalization import norm
@@ -102,7 +103,7 @@ class StringIndex:
                     if len(idx[value]) == 0:
                         idx.pop(value)
 
-    def get(self, values: list, indexes: list=['value', 'word', 'phrase', 'substring'], operator: str='and'):
+    def get(self, values: list, indexes: list=['value', 'word', 'phrase', 'substring'], operator: str='and', fuzzy=False):
         if isinstance(values, str):
             real_values = [values,]
         elif isinstance(values, list):
@@ -112,7 +113,7 @@ class StringIndex:
         real_values = [v.lower() for v in real_values]
         results = {}
         for idx in indexes:
-            r = getattr(self, f'_get_{idx}s')(real_values, operator)
+            r = getattr(self, f'_get_{idx}s')(real_values, operator, fuzzy)
             if r:
                 results[idx] = r
         if len(results) != len(indexes) and operator == 'and':
@@ -127,6 +128,8 @@ class StringIndex:
                 matches.update(ids)
             else:
                 raise ValueError(operator)
+        if matches is None:
+            return []
         return list(matches)
 
     def _get_phrase(self, phrase):
@@ -137,8 +140,16 @@ class StringIndex:
         else:
             return list(result)
 
-    def _get_phrases(self, phrases: list, operator: str='and'):
-        return self._get_multiples('phrase', phrases, operator)
+    def _get_phrase_fuzzy(self, phrase: str, min_ratio: int=70):
+        if not isinstance(phrase, str):
+            raise TypeError(type(phrase))
+        choices = list(self.phrases.keys())
+        matches = process.extract(phrase, choices)
+        matches = [m[0] for m in matches if m[1] >= min_ratio]
+        return self.get(matches, indexes=['phrase'], operator='or')
+
+    def _get_phrases(self, phrases: list, operator: str='and', fuzzy: bool=False):
+        return self._get_multiples('phrase', phrases, operator, fuzzy)
 
     def _get_substring(self, substring):
         try:
@@ -148,10 +159,18 @@ class StringIndex:
         else:
             return list(result)
 
-    def _get_substrings(self, substrings: list, operator: str='and'):
-        return self._get_multiples('substring', substrings, operator)
+    def _get_substring_fuzzy(self, substring, min_ratio: int=70):
+        if not isinstance(substring, str):
+            raise TypeError(type(substring))
+        choices = list(self.substrings.keys())
+        matches = process.extract(substring, choices)
+        matches = [m[0] for m in matches if m[1] >= min_ratio]
+        return self.get(matches, indexes=['substring'], operator='or')
 
-    def _get_value(self, value):
+    def _get_substrings(self, substrings: list, operator: str='and', fuzzy: bool=False):
+        return self._get_multiples('substring', substrings, operator, fuzzy)
+
+    def _get_value(self, value: str):
         try:
             result = self.values[value]
         except KeyError:
@@ -159,8 +178,16 @@ class StringIndex:
         else:
             return list(result)
 
-    def _get_values(self, values: list, operator: str='and'):
-        return self._get_multiples('value', values, operator)
+    def _get_value_fuzzy(self, value: str, min_ratio: int=70):
+        if not isinstance(value, str):
+            raise TypeError(type(value))
+        choices = list(self.values.keys())
+        matches = process.extract(value, choices)
+        matches = [m[0] for m in matches if m[1] >= min_ratio]
+        return self.get(matches, indexes=['value'], operator='or')
+
+    def _get_values(self, values: list, operator: str='and', fuzzy: bool=False):
+        return self._get_multiples('value', values, operator, fuzzy)
 
     def _get_word(self, word):
         try:
@@ -170,13 +197,24 @@ class StringIndex:
         else:
             return list(result)
 
-    def _get_words(self, words: list, operator: str='and'):
-        return self._get_multiples('word', words, operator)
+    def _get_word_fuzzy(self, word: str, min_ratio: int=70):
+        if not isinstance(word, str):
+            raise TypeError(type(word))
+        choices = list(self.words.keys())
+        matches = process.extract(word, choices)
+        matches = [m[0] for m in matches if m[1] >= min_ratio]
+        return self.get(matches, indexes=['word'], operator='or')
 
-    def _get_multiples(self, index: str, values: list, operator: str='and'):
+    def _get_words(self, words: list, operator: str='and', fuzzy: bool=False):
+        return self._get_multiples('word', words, operator, fuzzy)
+
+    def _get_multiples(self, index: str, values: list, operator: str='and', fuzzy: bool=False):
         results = {}
         for value in values:
-            r = getattr(self, f'_get_{index}')(value)
+            if fuzzy:
+                r = getattr(self, f'_get_{index}_fuzzy')(value)
+            else:
+                r = getattr(self, f'_get_{index}')(value)
             if r:
                 results[value] = r
         if len(values) != len(results) and operator == 'and':
@@ -185,9 +223,9 @@ class StringIndex:
         for value, ids in results.items():
             if matches is None:
                 matches = set(ids)
-            elif operator == 'and':
+            elif not fuzzy and operator == 'and':
                 matches = matches.intersection(ids)
-            elif operator == 'or':
+            elif fuzzy or operator == 'or':
                 matches.update(ids)
         if matches is None:
             return []
