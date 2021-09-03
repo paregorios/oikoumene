@@ -40,7 +40,6 @@ class Manager:
         fuzzy = False
         if 'fuzzy' in options:
             fuzzy = True
-            print('fuzzy!')
         sa = SelfAligner(self.gaz, text={'fuzzy': fuzzy})
         results = {}
         candidates = []
