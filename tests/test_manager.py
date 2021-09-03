@@ -5,6 +5,7 @@
 import json
 import logging
 from nose.tools import assert_equal, assert_false, assert_true, raises
+from oikoumene.gazetteer import Gazetteer
 from oikoumene.manager import Manager
 from pathlib import Path
 from unittest import TestCase
@@ -97,3 +98,18 @@ GeographicString: Moontown Airport""",
 4: Moontown [GeographicString]
 5: Moontown Airport [GeographicString]""",
             r)
+
+
+class Test_Manager_Alignment(TestCase):
+
+    def test_alignment_nominatim(self):
+        m = Manager()
+        m.load('data/examples/moontown_names.json')
+        r = m.align_external('Nominatim', options=['Madison County, Alabama'])
+        assert_equal(
+            '15 objects in the gazetteer have possible matches with Nominatim objects. Use "review Nominatim matches" to merge matches selectively.',
+            r)
+        r = m.review_nominatim_matches()
+        assert_true('Alignment candidate 1 of 15' in r)
+        r = m.review_nominatim_matches()
+        assert_true('Alignment candidate 2 of 15' in r)

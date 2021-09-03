@@ -108,7 +108,7 @@ class CLI:
         if object == 'self':
             return self.manager.align_self(options)
         else:
-            raise NotImplementedError(object)
+            return self.manager.align_external(object, options)
 
     def _v_contents(self):
         """List contents of the gazetteer."""
@@ -227,9 +227,10 @@ class CLI:
 
     def _v_review(self, object:str, options: list):
         """Review alignment matches for possible action."""
+        fn = f'review_{object}'
         if options:
-            raise TypeError(options)
-        return getattr(self.manager, f'review_{object}')()
+            fn += f'_{"_".join(options)}'
+        return getattr(self.manager, fn)()
 
     def _v_save(self, object: str, options: list):
         """Save gazetteer content to a file."""

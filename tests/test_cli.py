@@ -298,13 +298,20 @@ class Test_CLI_Alignment(TestCase):
         cmd = 'align self'
         r = self.cli._parse(cmd.split())
         assert_equal(
-            '1 object in the gazetteer has possible matches with other objects. Use "review matches" to merge matches selectively.',
+            '1 object in the gazetteer has possible matches with other objects. Use "review self matches" to merge matches selectively.',
             r)
 
     def test_fuzzy(self):
         cmd = 'align self fuzzy'
         r = self.cli._parse(cmd.split())
         assert_equal(
-            '3 objects in the gazetteer have possible matches with other objects. Use "review matches" to merge matches selectively.',
+            '3 objects in the gazetteer have possible matches with other objects. Use "review self matches" to merge matches selectively.',
+            r)
+
+    def test_external_nominatim(self):
+        cmd = 'align nominatim Madison County, Alabama'
+        r = self.cli._parse(cmd.split())
+        assert_equal(
+            '15 objects in the gazetteer have possible matches with nominatim objects. Use "review nominatim matches" to merge matches selectively.',
             r)
         
