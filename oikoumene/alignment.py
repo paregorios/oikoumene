@@ -45,8 +45,7 @@ class SelfAligner(BaseAligner):
         BaseAligner.__init__(self, **kwargs)
 
     def _align_text(self, obj, **options):
-        if options:
-            logger.warning('_align_text options ignored')
+        
         unique_strings = set()
         for fieldname, values in self.gaz._get_indexable_fields(obj).items():
             if isinstance(values, str):
@@ -54,7 +53,11 @@ class SelfAligner(BaseAligner):
             elif isinstance(values, list):
                 unique_strings.update([norm(v) for v in values])
         unique_strings = list(unique_strings)
-        results = self.gaz._indexes['_all_text'].get(unique_strings, indexes=['value'], operator='or')
+        try:
+            fuzzy = options['fuzzy']
+        except KeyError:
+            fuzzy = False
+        results = self.gaz._indexes['_all_text'].get(unique_strings, indexes=['value'], operator='or', fuzzy=fuzzy)
         return [r for r in results if r != obj.id]
 
 class OnlineAligner(BaseAligner):

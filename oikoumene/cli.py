@@ -106,7 +106,7 @@ class CLI:
     def _v_align(self, object: str, options: list):
         """Align objects within the gazetteer."""
         if object == 'self':
-            return self.manager.align_self()
+            return self.manager.align_self(options)
         else:
             raise NotImplementedError(object)
 

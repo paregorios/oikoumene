@@ -36,8 +36,12 @@ class Manager:
         else:
             return '\n'.join([f'{prefix}{k}: {v[1]} [{v[2]}]' for k, v in self._context.items()])
 
-    def align_self(self):
-        sa = SelfAligner(self.gaz, text={})
+    def align_self(self, options: list):
+        fuzzy = False
+        if 'fuzzy' in options:
+            fuzzy = True
+            print('fuzzy!')
+        sa = SelfAligner(self.gaz, text={'fuzzy': fuzzy})
         results = {}
         candidates = []
         prior_match_batches = set()
@@ -173,6 +177,11 @@ class Manager:
             k, v = element.split(':')
             d[k] = v
         return d
+
+    def _parse_options_list(self, options: list):
+        if len(options) == 0:
+            return {}
+        
 
     def promote(self, context_numbers: list):
         if self.gaz is None:

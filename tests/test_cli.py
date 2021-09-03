@@ -297,4 +297,14 @@ class Test_CLI_Alignment(TestCase):
     def test_doublet(self):
         cmd = 'align self'
         r = self.cli._parse(cmd.split())
-        print(r)
+        assert_equal(
+            '1 object in the gazetteer has possible matches with other objects. Use "review matches" to merge matches selectively.',
+            r)
+
+    def test_fuzzy(self):
+        cmd = 'align self fuzzy'
+        r = self.cli._parse(cmd.split())
+        assert_equal(
+            '3 objects in the gazetteer have possible matches with other objects. Use "review matches" to merge matches selectively.',
+            r)
+        
