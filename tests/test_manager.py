@@ -99,7 +99,6 @@ GeographicString: Moontown Airport""",
 5: Moontown Airport [GeographicString]""",
             r)
 
-
 class Test_Manager_Alignment(TestCase):
 
     def test_alignment_nominatim(self):

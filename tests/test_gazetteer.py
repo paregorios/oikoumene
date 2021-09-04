@@ -201,6 +201,20 @@ class Test_Gazetteer(TestCase):
         for id, obj in entries.items():
             assert_true(isinstance(obj, Place))
 
+    def test_merge_strings(self):
+        path = Path('data/examples/moontown_names.txt').resolve()
+        parser = StringParser(delimiter='\n')
+        with open(path, 'r', encoding='utf-8') as f:
+            data = parser.parse(f)
+        del f
+        gaz = Gazetteer(data)
+        entries = gaz.get({'text': 'Berry Road'}, operator='or')
+        assert_equal(2, len(entries))
+        merge_ids = [id for id, obj in entries.items()]
+        gaz.merge(merge_ids)
+        entries = gaz.get({'text': 'Berry Road'}, operator='or')
+        assert_equal(1, len(entries))
+
     def test_make_place(self):
         path = Path('data/examples/moontown_names.json').resolve()
         with open(path, 'r', encoding='utf-8') as f:

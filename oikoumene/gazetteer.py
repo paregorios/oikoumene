@@ -162,17 +162,23 @@ class Gazetteer(Serializeable):
         return target.id
 
     def _merge_geographicname_to_geographicname(self, target, gname):
-        if gname.attested and target.attested:
-            if gname.attested != target.attested:
+        return self._merge_stringlike(target, gname)
+        
+    def _merge_geographicstring_to_geographicstring(self, target, gstring):
+        return self._merge_stringlike(target, gstring)
+
+    def _merge_stringlike(self, target, other):
+        if other.attested and target.attested:
+            if other.attested != target.attested:
                 # can't combine so make a place to hold both
-                return self._merge_to_place([target, gname])
-        elif target.attested and not gname.attested:
+                return self._merge_to_place([target, other])
+        elif target.attested and not other.attested:
             pass
-        elif not target.attested and gname.attested:
-            target.attested = gname.attested
+        elif not target.attested and other.attested:
+            target.attested = other.attested
         else:
             raise RuntimeError("?")
-        for rname in gname.romanized:
+        for rname in other.romanized:
             target.romanized = rname
         return target
 
