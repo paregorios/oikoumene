@@ -7,6 +7,7 @@ Place
 from copy import deepcopy
 import logging
 from oikoumene.base import Base
+from oikoumene.connection import Connection
 from oikoumene.serialization import Serializeable
 from oikoumene.stringlike import Dict2StringlikeParser, GeographicName, GeographicString
 from pprint import pprint
@@ -20,6 +21,7 @@ class Place(Base, Serializeable):
     def __init__(self, source=None, encoding='utf-8'):
         Base.__init__(self)
         Serializeable.__init__(self)
+        self.connections = {}
         self.names = {}
         self.strings = {}
         self._label = ''
@@ -29,7 +31,7 @@ class Place(Base, Serializeable):
 
     def add(
         self, 
-        source: Union[dict, GeographicName, GeographicString, Sequence[Union[dict, GeographicName, GeographicString]]],
+        source: Union[dict, Connection, GeographicName, GeographicString, Sequence[Union[dict, Connection, GeographicName, GeographicString]]],
         encoding='utf-8'
     ):
         if isinstance(source, str):
@@ -45,17 +47,32 @@ class Place(Base, Serializeable):
             raise NotImplementedError(type(source))
         elif isinstance(source, dict):
             result = self._dict_parser.parse_dict(source)
-        elif isinstance(source, (GeographicName, GeographicString)):
+        elif isinstance(source, (Connection, GeographicName, GeographicString)):
             result = source
         else:
             raise TypeError(
                 f'Unexpected type ({type(source)}) passed to Place "add" method. '
                 f'Expected {dict}, {GeographicName}, {GeographicString} or a {Sequence} of same.')            
 
-        if isinstance(result, GeographicName):
+        if isinstance(result, Connection):
+            self.add_connection(result)
+        elif isinstance(result, GeographicName):
             self.add_name(result)
         elif isinstance(result, GeographicString):
             self.add_string(result)
+
+    def add_connection(self, obj:Connection):
+        if not isinstance(obj, Connection):
+            raise TypeError(
+                f'Unexpected type ({type(obj)}) passed to Place "add_connection" method. '
+                f'Expected {Connection}.')
+        try:
+            self.connections[obj.id]
+        except KeyError:
+            self.connections[obj.id] = obj
+        else:
+            new_id = obj.make_unique_id(list(self.connections.keys()))
+            self.connections[new_id] = obj
 
     def add_name(self, obj:GeographicName):
         if not isinstance(obj, GeographicName):

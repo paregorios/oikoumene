@@ -4,6 +4,7 @@
 
 import logging
 from nose.tools import assert_equal, assert_false, assert_true, raises
+from oikoumene.connection import Connection
 from oikoumene.id import make_id_valid
 from oikoumene.stringlike import GeographicName, GeographicString
 from oikoumene.place import Dict2PlaceParser, Place
@@ -100,6 +101,12 @@ class Test_Place(TestCase):
             assert_true(k in p.names.keys())
         for k in ['_3m5', 'landing-strip']:
             assert_true(k in p.strings.keys())
+
+    def test_add_connection(self):
+        c = Connection(term='closeMatch')
+        p = Place()
+        p.add_connection(c)
+        assert_equal(1, len(p.connections))
 
     def test_add_name(self):
         n = GeographicName('Moontown')
