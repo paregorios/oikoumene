@@ -1,0 +1,10 @@
+{
+    "closeMatch": {
+        "uri": "http://www.w3.org/2004/02/skos/core#closeMatch",
+        "definition": "A skos:closeMatch link indicates that two concepts are sufficiently similar that they can be used interchangeably in some information retrieval applications."
+    },
+    "exactMatch": {
+        "uri": "http://www.w3.org/2004/02/skos/core#exactMatch",
+        "definition": "A skos:exactMatch link indicates a high degree of confidence that two concepts can be used interchangeably across a wide range of information retrieval applications."
+    }
+}
